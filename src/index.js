@@ -2950,9 +2950,13 @@ async function generateProxyCollectionConfig(collectionId, env) {
 				'respect-rules': true,
 				'enhanced-mode': 'fake-ip',
 				'fake-ip-range': '198.18.0.1/16',
+				'default-nameserver': [
+					'223.5.5.5',
+					'1.12.12.12',
+				],
 				nameserver: [
-					'https://8.8.8.8/dns-query#disable-ipv6=true',
-					'https://1.1.1.1/dns-query#disable-ipv6=true',
+					'https://223.5.5.5/dns-query#disable-ipv6=true',
+					'https://1.12.12.12/dns-query#disable-ipv6=true',
 				],
 				'proxy-server-nameserver': [
 					'https://223.5.5.5/dns-query',
@@ -3334,6 +3338,7 @@ async function generateProxyCollectionConfig(collectionId, env) {
 			// 规则配置
 			rules: [
 				// 自定义优先规则
+				'DOMAIN-SUFFIX,yfjc.xyz,DIRECT',
 				'DOMAIN-SUFFIX,linux.do,Linux DO',
 				'DOMAIN-SUFFIX,idcflare.com,Linux DO',
 				'DOMAIN-SUFFIX,anyrouter.top,DIRECT',
@@ -3350,6 +3355,7 @@ async function generateProxyCollectionConfig(collectionId, env) {
 				'DOMAIN-SUFFIX,cdn.bcebos.com,DIRECT',
 				'RULE-SET,Advertising-ads,REJECT',
 				// 内网
+				'IP-CIDR,224.0.0.0/24,DIRECT',
 				'RULE-SET,Private,DIRECT',
 				'RULE-SET,Fakeip_Filter,DIRECT',
 
@@ -3406,7 +3412,6 @@ async function generateProxyCollectionConfig(collectionId, env) {
 				'IP-CIDR,10.0.0.0/8,DIRECT',
 				'IP-CIDR,17.0.0.0/8,DIRECT',
 				'IP-CIDR,100.64.0.0/10,DIRECT',
-				'IP-CIDR,224.0.0.0/24,DIRECT',
 				//'RULE-SET,LAN,DIRECT',
 
 				// CN
@@ -3558,9 +3563,13 @@ async function generateSubCollectionConfig(collectionId, env) {
 			'respect-rules': true,
 			'enhanced-mode': 'fake-ip',
 			'fake-ip-range': '198.18.0.1/16',
+			'default-nameserver': [
+				'223.5.5.5',
+				'1.12.12.12',
+			],
 			nameserver: [
-				'https://8.8.8.8/dns-query#disable-ipv6=true',
-				'https://1.1.1.1/dns-query#disable-ipv6=true',
+				'https://223.5.5.5/dns-query#disable-ipv6=true',
+				'https://1.12.12.12/dns-query#disable-ipv6=true',
 			],
 			'proxy-server-nameserver': [
 				'https://223.5.5.5/dns-query',
@@ -3569,6 +3578,10 @@ async function generateSubCollectionConfig(collectionId, env) {
 			'nameserver-policy': {
 				// '+.ddnsdomain.xyz': '114.114.114.114',
 				'rule-set:cn_domain': [
+					'https://223.5.5.5/dns-query',
+					'https://1.12.12.12/dns-query',
+				],
+				'+.yfjc.xyz': [
 					'https://223.5.5.5/dns-query',
 					'https://1.12.12.12/dns-query',
 				]
@@ -3634,6 +3647,7 @@ async function generateSubCollectionConfig(collectionId, env) {
 					url: pair.url,
 					type: 'http',
 					interval: 3600,
+					path: './providers/${providerName}.yaml',
 					'health-check': {
 						enable: true,
 						url: 'https://www.gstatic.com/generate_204',
@@ -3810,7 +3824,7 @@ async function generateSubCollectionConfig(collectionId, env) {
 				'include-all': true,
 				tolerance: 80,
 				interval: 120,
-				'exclude-filter': '^(?=.*((?i)10x|6x|过滤|客户端|不要|付款|如果|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|建议|备用|作者|加入|\\\\b(USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author)\\\\b|(\\\\d{4}-\\\\d{2}-\\\\d{2}|\\\\d+G))).*$'
+				'exclude-filter': '^(?=.*((?i)10x|6x|过滤|客户端|不要|付款|如果|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|建议|备用|作者|加入|\\\\b(USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author)\\\\b|(\\\\d{4}-\\\\d{2}-\\\\d{2}|\\\\d+G))).*$'
 			},
 			// {
 			// 	name: '♻️ 英国自动 🇬🇧',
@@ -4238,6 +4252,7 @@ async function generateSubCollectionConfig(collectionId, env) {
 		// submerge规则匹配
 		config.rules = [
 			// 自定义优先规则
+			'DOMAIN-SUFFIX,yfjc.xyz,DIRECT',
 			'DOMAIN-SUFFIX,linux.do,Linux DO',
 			'DOMAIN-SUFFIX,idcflare.com,Linux DO',
 			'DOMAIN-SUFFIX,anyrouter.top,DIRECT',
@@ -4254,6 +4269,7 @@ async function generateSubCollectionConfig(collectionId, env) {
 			'DOMAIN-SUFFIX,cdn.bcebos.com,DIRECT',
 			'RULE-SET,Advertising-ads,REJECT',
 			// 内网
+			'IP-CIDR,224.0.0.0/24,DIRECT',
 			'RULE-SET,Private,DIRECT',
 			'RULE-SET,Fakeip_Filter,DIRECT',
 
@@ -4310,7 +4326,6 @@ async function generateSubCollectionConfig(collectionId, env) {
 			'IP-CIDR,10.0.0.0/8,DIRECT',
 			'IP-CIDR,17.0.0.0/8,DIRECT',
 			'IP-CIDR,100.64.0.0/10,DIRECT',
-			'IP-CIDR,224.0.0.0/24,DIRECT',
 			//'RULE-SET,LAN,DIRECT',
 
 			// CN
