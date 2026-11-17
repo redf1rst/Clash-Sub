@@ -2950,13 +2950,17 @@ async function generateProxyCollectionConfig(collectionId, env) {
 				'respect-rules': true,
 				'enhanced-mode': 'fake-ip',
 				'fake-ip-range': '198.18.0.1/16',
+				'fake-ip-filter': [
+					'*.lan',
+					'*.local',
+				],
 				'default-nameserver': [
 					'223.5.5.5',
 					'1.12.12.12',
 				],
 				nameserver: [
-					'https://223.5.5.5/dns-query#disable-ipv6=true',
-					'https://1.12.12.12/dns-query#disable-ipv6=true',
+					'https://8.8.8.8/dns-query#disable-ipv6=true',
+					'https://1.1.1.1/dns-query#disable-ipv6=true',
 				],
 				'proxy-server-nameserver': [
 					'https://223.5.5.5/dns-query',
@@ -3563,13 +3567,17 @@ async function generateSubCollectionConfig(collectionId, env) {
 			'respect-rules': true,
 			'enhanced-mode': 'fake-ip',
 			'fake-ip-range': '198.18.0.1/16',
+			'fake-ip-filter': [
+				'*.lan',
+				'*.local',
+			],
 			'default-nameserver': [
 				'223.5.5.5',
 				'1.12.12.12',
 			],
 			nameserver: [
-				'https://223.5.5.5/dns-query#disable-ipv6=true',
-				'https://1.12.12.12/dns-query#disable-ipv6=true',
+				'https://8.8.8.8/dns-query#disable-ipv6=true',
+				'https://1.1.1.1/dns-query#disable-ipv6=true',
 			],
 			'proxy-server-nameserver': [
 				'https://223.5.5.5/dns-query',
