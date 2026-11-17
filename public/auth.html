@@ -335,13 +335,13 @@
 					const urlParams = new URLSearchParams(window.location.search);
 					let redirect = urlParams.get('redirect') || '/';
 
-					// 添加verified参数，避免重定向后立即被cookie检查拦截
+					// 用 URL 解析做同源约束(防止被构造成开放重定向), 只取 path + search
 					const redirectUrl = new URL(redirect, window.location.origin);
-					redirectUrl.searchParams.set('verified', '1');
+					const target = redirectUrl.pathname + redirectUrl.search;
 
 					// 延迟跳转，让用户看到成功消息
 					setTimeout(() => {
-						window.location.href = redirectUrl.pathname + redirectUrl.search;
+						window.location.href = target;
 					}, 500);
 				} else {
 					showMessage(result.message || '令牌验证失败，请检查令牌是否正确');

@@ -7,42 +7,38 @@
 	<title>Clash Sub</title>
 	<link rel="icon" type="image/png" href="https://github.com/redf1rst/clash-sub/blob/main/img/clash-sub.png?raw=true">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css" />
-	<!-- 访问令牌检查 - 在页面加载前执行 -->
 	<script>
+		// 访问控制在 Worker 侧统一完成 (wrangler.toml: run_worker_first = true)。
+		// 页面能被送到浏览器, 就说明 Worker 认证已通过, 前端不再做二次 Cookie 判断:
+		// 之前基于 JS 可读 cookie (access_token_client) 的前端门禁在手机端会误判
+		// (iOS ITP 把脚本可写 Cookie 压到 7 天 / 微信等 WebView Cookie 罐不持久),
+		// 导致 HttpOnly 令牌仍在却仍被弹回 /auth。
 		(function () {
-			// 检查是否有访问令牌Cookie (检查前端可读的标记cookie)
-			function hasTokenCookie() {
-				return document.cookie.split(';').some(function (c) {
-					return c.trim().startsWith('access_token_client=');
+			// 兼容旧版登录跳转残留的 ?verified=1 参数, 静默清理
+			if (new URLSearchParams(window.location.search).get('verified') === '1') {
+				var u = new URL(window.location.href);
+				u.searchParams.delete('verified');
+				window.history.replaceState({}, document.title, u.pathname + u.search);
+			}
+		})();
+
+		// 令牌失效时 (Worker 对 /api/* 返回 401) 统一回验证页, 避免每处 fetch 各写一套处理
+		(function () {
+			if (typeof window.fetch !== 'function') return;
+			var rawFetch = window.fetch.bind(window);
+			window.fetch = function (input, init) {
+				return rawFetch(input, init).then(function (res) {
+					try {
+						var rawUrl = typeof input === 'string' ? input : (input && input.url) || '';
+						var path = new URL(rawUrl, window.location.origin).pathname;
+						if (res.status === 401 && path.indexOf('/api/') === 0) {
+							var back = window.location.pathname + window.location.search;
+							window.location.href = '/auth?redirect=' + encodeURIComponent(back);
+						}
+					} catch (e) { /* 忽略解析失败 */ }
+					return res;
 				});
-			}
-
-			// 检查是否是从验证页面刚刚跳转过来(带verified参数)
-			function isJustVerified() {
-				var urlParams = new URLSearchParams(window.location.search);
-				return urlParams.get('verified') === '1';
-			}
-
-			// 如果刚验证成功,清理URL参数并跳过cookie检查
-			if (isJustVerified()) {
-				// 清理URL中的verified参数
-				var url = new URL(window.location.href);
-				url.searchParams.delete('verified');
-				window.history.replaceState({}, document.title, url.pathname + url.search);
-				return; // 跳过cookie检查,允许页面加载
-			}
-
-			// 如果没有令牌Cookie，重定向到验证页面
-			if (!hasTokenCookie()) {
-				var currentPath = window.location.pathname;
-				var currentSearch = window.location.search;
-
-				// 避免在验证页面上无限重定向
-				if (currentPath !== '/auth' && currentPath !== '/auth.html') {
-					var redirectUrl = '/auth?redirect=' + encodeURIComponent(currentPath + currentSearch);
-					window.location.href = redirectUrl;
-				}
-			}
+			};
 		})();
 	</script>
 	<style>

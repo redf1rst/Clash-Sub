@@ -8,10 +8,18 @@ function getTokenFromCookie(request) {
 	if (!cookieHeader) return null;
 
 	const cookies = cookieHeader.split(';').map(c => c.trim());
+	// 注意: 不能用 startsWith('access_token=') 之外的模糊匹配,
+	// 否则会把前端标记 cookie (access_token_client=1) 误认成令牌。
 	const tokenCookie = cookies.find(c => c.startsWith('access_token='));
 
 	if (!tokenCookie) return null;
-	return tokenCookie.split('=')[1];
+
+	// 用 slice 截取并解码, 避免令牌中含 '='、';'、',' 时被截断
+	try {
+		return decodeURIComponent(tokenCookie.slice('access_token='.length));
+	} catch (e) {
+		return null;
+	}
 }
 
 /**
@@ -25,12 +33,17 @@ function setTokenCookie(token, isSecure = false) {
 	const maxAge = 30 * 24 * 60 * 60;
 	// 在HTTPS环境下使用Secure属性,HTTP环境(如本地开发)不使用
 	const secureFlag = isSecure ? '; Secure' : '';
+	// 令牌可能包含 '='、';'、',' 等字符, 必须编码后再写入 Cookie
+	const encodedToken = encodeURIComponent(token);
 
 	// 双Cookie策略:
 	// 1. HttpOnly cookie用于后端验证(更安全,JS无法读取)
-	const httpOnlyCookie = `access_token=${token}; Path=/; Max-Age=${maxAge}; HttpOnly; SameSite=Strict${secureFlag}`;
+	// SameSite=Lax: Strict 会在"从其他站点/App 点链接进来"的顶层导航中被浏览器丢弃,
+	// 手机端(微信、QQ、外链跳转、扫码)因此每次都被要求重新填写令牌; Lax 允许跨站顶层
+	// GET 导航携带 Cookie, 同时仍然拦截跨站 POST/iframe 携带。
+	const httpOnlyCookie = `access_token=${encodedToken}; Path=/; Max-Age=${maxAge}; HttpOnly; SameSite=Lax${secureFlag}`;
 	// 2. 前端可读cookie仅用于标记已登录(不包含敏感信息)
-	const frontendCookie = `access_token_client=1; Path=/; Max-Age=${maxAge}; SameSite=Strict${secureFlag}`;
+	const frontendCookie = `access_token_client=1; Path=/; Max-Age=${maxAge}; SameSite=Lax${secureFlag}`;
 
 	return [httpOnlyCookie, frontendCookie];
 }
@@ -42,9 +55,9 @@ function setTokenCookie(token, isSecure = false) {
  */
 function clearTokenCookie(isSecure = false) {
 	const secureFlag = isSecure ? '; Secure' : '';
-	// 清除两个cookie
-	const clearHttpOnly = `access_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict${secureFlag}`;
-	const clearFrontend = `access_token_client=; Path=/; Max-Age=0; SameSite=Strict${secureFlag}`;
+	// 清除两个cookie (属性必须与写入时一致, 否则浏览器视为不同Cookie而清不掉)
+	const clearHttpOnly = `access_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax${secureFlag}`;
+	const clearFrontend = `access_token_client=; Path=/; Max-Age=0; SameSite=Lax${secureFlag}`;
 	return [clearHttpOnly, clearFrontend];
 }
 
@@ -119,9 +132,24 @@ function checkToken(request, env) {
 	const isValid = verifyToken(token, env);
 
 	if (!isValid) {
-		// 令牌无效，重定向到验证页面
+		// API 请求返回 401 JSON, 不要 302 到 HTML 验证页:
+		// 前端 fetch 拿到 HTML 会被误判成网络错误/解析失败
+		if (path.startsWith('/api/') || path.startsWith('/clash/')) {
+			return {
+				authenticated: false,
+				response: new Response(JSON.stringify({
+					success: false,
+					message: '访问令牌无效或已过期'
+				}), {
+					status: 401,
+					headers: { 'Content-Type': 'application/json' }
+				})
+			};
+		}
+
+		// 页面请求重定向到验证页面, 并保留原始路径与查询参数以便登录后回跳
 		const authUrl = new URL('/auth', url.origin);
-		authUrl.searchParams.set('redirect', path);
+		authUrl.searchParams.set('redirect', path + url.search);
 
 		return {
 			authenticated: false,

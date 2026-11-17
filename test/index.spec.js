@@ -56,38 +56,36 @@ describe('Clash订阅生成器 Worker', () => {
 	});
 
 	describe('Config Generation', () => {
-		it('GET /clash/proxies returns YAML config', async () => {
+		// 旧版全局端点 (/clash/proxies, /clash/submerge) 已移除, 仅支持集合版
+		// /clash/proxies/{collectionId} 与 /clash/submerge/{collectionId}
+		it('GET /clash/proxies (legacy global endpoint) returns 404', async () => {
 			const request = new Request('http://example.com/clash/proxies');
 			const ctx = createExecutionContext();
 			const response = await worker.fetch(request, env, ctx);
 			await waitOnExecutionContext(ctx);
 
-			expect(response.status).toBe(200);
-			expect(response.headers.get('Content-Type')).toBe('text/yaml; charset=utf-8');
-			expect(response.headers.get('Content-Disposition')).toBe('attachment; filename=ProxySub');
+			expect(response.status).toBe(404);
 		});
 
-		it('GET /clash/submerge returns YAML config', async () => {
+		it('GET /clash/submerge (legacy global endpoint) returns 404', async () => {
 			const request = new Request('http://example.com/clash/submerge');
 			const ctx = createExecutionContext();
 			const response = await worker.fetch(request, env, ctx);
 			await waitOnExecutionContext(ctx);
 
-			expect(response.status).toBe(200);
-			expect(response.headers.get('Content-Type')).toBe('text/yaml; charset=utf-8');
-			expect(response.headers.get('Content-Disposition')).toBe('attachment; filename=SubMerge');
+			expect(response.status).toBe(404);
 		});
 	});
 
 	describe('Static File Serving', () => {
-		it('GET / returns 404 in test environment (static files handled by platform)', async () => {
+		it('GET / serves the static index page', async () => {
 			const request = new Request('http://example.com/');
 			const ctx = createExecutionContext();
 			const response = await worker.fetch(request, env, ctx);
 			await waitOnExecutionContext(ctx);
 
-			// 在测试环境中，静态文件处理由平台处理，worker 返回 404 是正常的
-			expect(response.status).toBe(404);
+			// 静态资源由 ASSETS binding 提供
+			expect(response.status).toBe(200);
 		});
 	});
 
@@ -98,8 +96,8 @@ describe('Clash订阅生成器 Worker', () => {
 			const response = await worker.fetch(request, env, ctx);
 			await waitOnExecutionContext(ctx);
 
+			// 不存在的路径交给 ASSETS, 响应体由平台决定, 只断言状态码
 			expect(response.status).toBe(404);
-			expect(await response.text()).toBe('Not Found');
 		});
 	});
 
@@ -269,6 +267,78 @@ describe('Clash订阅生成器 Worker', () => {
 					expect(subInfo.expire).toBe(expected.expire);
 				});
 			});
+		});
+	});
+
+	describe('Access Token Auth', () => {
+		// 这些用例临时打开令牌校验, 覆盖手机端"每次都要重新填令牌"的回归点
+		const authEnv = { ...env, ACCESS_TOKEN_ENABLED: 'true', ACCESS_TOKEN: 'my=secret;token' };
+
+		async function call(request) {
+			const ctx = createExecutionContext();
+			const response = await worker.fetch(request, authEnv, ctx);
+			await waitOnExecutionContext(ctx);
+			return response;
+		}
+
+		it('sets both cookies with SameSite=Lax (mobile in-app navigations must carry them)', async () => {
+			const response = await call(new Request('http://example.com/api/verify-token', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ token: 'my=secret;token' })
+			}));
+
+			expect(response.status).toBe(200);
+
+			const cookies = response.headers.getSetCookie();
+			expect(cookies).toHaveLength(2);
+
+			const tokenCookie = cookies.find(c => c.startsWith('access_token='));
+			const markerCookie = cookies.find(c => c.startsWith('access_token_client='));
+
+			expect(tokenCookie).toContain('SameSite=Lax');
+			expect(tokenCookie).not.toContain('Strict');
+			expect(tokenCookie).toContain('HttpOnly');
+			expect(markerCookie).toContain('SameSite=Lax');
+			expect(markerCookie).not.toContain('Strict');
+		});
+
+		it('treats the frontend marker cookie alone as NOT logged in', async () => {
+			const response = await call(new Request('http://example.com/api/proxies', {
+				headers: { Cookie: 'access_token_client=1' }
+			}));
+
+			expect(response.status).toBe(401);
+		});
+
+		it('round-trips a token containing = ; , through the cookie', async () => {
+			const response = await call(new Request('http://example.com/api/proxies', {
+				headers: { Cookie: 'access_token=' + encodeURIComponent('my=secret;token') + '; access_token_client=1' }
+			}));
+
+			expect(response.status).toBe(200);
+		});
+
+		it('returns 401 JSON (not a 302 to HTML) for unauthenticated API calls', async () => {
+			const response = await call(new Request('http://example.com/api/proxies'));
+
+			expect(response.status).toBe(401);
+			expect(response.headers.get('Content-Type')).toBe('application/json');
+		});
+
+		it('redirects page requests to /auth keeping path and query', async () => {
+			const response = await call(new Request('http://example.com/some/page?x=1'));
+
+			expect(response.status).toBe(302);
+			const location = decodeURIComponent(response.headers.get('Location'));
+			expect(location).toContain('/auth?redirect=/some/page?x=1');
+		});
+
+		it('keeps subscription endpoints whitelisted for Clash clients', async () => {
+			const response = await call(new Request('http://example.com/clash/submerge/123'));
+
+			expect(response.status).not.toBe(401);
+			expect(response.status).not.toBe(302);
 		});
 	});
 });
