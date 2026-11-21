@@ -1,372 +1,228 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>访问验证 - Clash订阅生成器</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#f5f2e9">
+	<title>访问验证 · Clash Sub</title>
 	<link rel="icon" type="image/png" href="https://github.com/redf1rst/clash-sub/blob/main/img/clash-sub.png?raw=true">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
 	<style>
-		* {
-			margin: 0;
-			padding: 0;
-			box-sizing: border-box;
+		:root {
+			color-scheme: light;
+			--canvas: #f5f2e9;
+			--paper: #fffdf7;
+			--ink: #192d26;
+			--pine: #174637;
+			--pine-deep: #102f26;
+			--muted: #52655b;
+			--line: #d6ddd1;
+			--accent: #e7bd76;
+			--danger: #a5423a;
+			--sans: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+			--display: 'Fraunces', 'Noto Sans SC', serif;
 		}
-
+		* { box-sizing: border-box; }
 		body {
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', 'Apple Color Emoji', Roboto, sans-serif;
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 			min-height: 100vh;
+			margin: 0;
+			padding: 32px 20px;
+			display: grid;
+			place-items: center;
+			color: var(--ink);
+			background: var(--canvas);
+			font-family: var(--sans);
+			-webkit-font-smoothing: antialiased;
+		}
+		.auth-shell {
+			width: min(100%, 440px);
+			animation: arrive .42s cubic-bezier(.2,.75,.25,1) both;
+		}
+		.brand {
 			display: flex;
 			align-items: center;
-			justify-content: center;
-			padding: 20px;
+			gap: 12px;
+			margin: 0 0 22px 4px;
 		}
-
-		.auth-container {
-			background: white;
-			border-radius: 16px;
-			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-			overflow: hidden;
-			max-width: 450px;
+		.brand-mark {
+			width: 42px;
+			height: 42px;
+			display: grid;
+			place-items: center;
+			border-radius: 13px;
+			background: var(--pine);
+			color: var(--paper);
+			box-shadow: inset 0 0 0 1px rgba(255,255,255,.16);
+		}
+		.brand-mark svg { width: 23px; height: 23px; }
+		.brand-copy { display: grid; gap: 1px; }
+		.brand-name { font: 600 20px/1.1 var(--display); letter-spacing: -.025em; }
+		.brand-caption { color: var(--muted); font-size: 11px; letter-spacing: .11em; text-transform: uppercase; }
+		.auth-card {
+			padding: clamp(26px, 7vw, 42px);
+			border: 1px solid var(--line);
+			border-radius: 9px;
+			background: var(--paper);
+			box-shadow: 0 18px 55px rgba(25,45,38,.08), 0 2px 8px rgba(25,45,38,.035);
+		}
+		.eyebrow { margin: 0 0 9px; color: var(--pine); font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+		h1 { margin: 0; font: 500 clamp(30px, 8vw, 38px)/1.2 var(--display); letter-spacing: -.035em; }
+		.intro { margin: 12px 0 30px; color: var(--muted); font-size: 14px; line-height: 1.75; }
+		.form-group { margin-bottom: 19px; }
+		label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; }
+		.input-wrap { position: relative; }
+		#token {
 			width: 100%;
-			animation: slideUp 0.5s ease-out;
-		}
-
-		@keyframes slideUp {
-			from {
-				opacity: 0;
-				transform: translateY(30px);
-			}
-			to {
-				opacity: 1;
-				transform: translateY(0);
-			}
-		}
-
-		.auth-header {
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			padding: 40px 30px;
-			text-align: center;
-			color: white;
-		}
-
-		.auth-header h1 {
-			font-size: 28px;
-			margin-bottom: 8px;
-			font-weight: 600;
-		}
-
-		.auth-header p {
-			font-size: 14px;
-			opacity: 0.9;
-		}
-
-		.auth-body {
-			padding: 40px 30px;
-		}
-
-		.info-box {
-			background: #e3f2fd;
-			border-left: 4px solid #2196f3;
-			padding: 16px;
-			margin-bottom: 24px;
-			border-radius: 4px;
-		}
-
-		.info-box p {
-			color: #1976d2;
-			font-size: 14px;
-			line-height: 1.6;
-			margin: 0;
-		}
-
-		.info-box strong {
-			display: block;
-			margin-bottom: 8px;
-			font-size: 15px;
-		}
-
-		.form-group {
-			margin-bottom: 24px;
-		}
-
-		.form-group label {
-			display: block;
-			margin-bottom: 8px;
-			color: #2c3e50;
-			font-weight: 500;
-			font-size: 14px;
-		}
-
-		.input-wrapper {
-			position: relative;
-		}
-
-		.input-icon {
-			position: absolute;
-			left: 14px;
-			top: 50%;
-			transform: translateY(-50%);
-			color: #95a5a6;
-			font-size: 18px;
-		}
-
-		.form-control {
-			width: 100%;
-			padding: 12px 14px 12px 44px;
-			border: 2px solid #e0e0e0;
-			border-radius: 8px;
-			font-size: 15px;
-			transition: all 0.3s ease;
-			background: #f8f9fa;
-			font-family: 'Courier New', monospace;
-		}
-
-		.form-control:focus {
+			min-height: 50px;
+			padding: 0 52px 0 15px;
+			border: 1px solid #c7d1c7;
+			border-radius: 6px;
 			outline: none;
-			border-color: #667eea;
-			background: white;
-			box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+			background: #fffefa;
+			color: var(--ink);
+			font: 14px/1.4 ui-monospace, 'SFMono-Regular', Consolas, monospace;
+			transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
 		}
-
-		.form-control:hover {
-			border-color: #bdc3c7;
-		}
-
-		.btn-verify {
-			width: 100%;
-			padding: 14px;
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			color: white;
-			border: none;
-			border-radius: 8px;
-			font-size: 16px;
-			font-weight: 600;
+		#token::placeholder { color: #89958c; font-family: var(--sans); }
+		#token:hover { border-color: #94aa98; }
+		#token:focus-visible { border-color: var(--pine); box-shadow: 0 0 0 3px rgba(23,70,55,.13); background: #fff; }
+		.reveal-token {
+			position: absolute;
+			right: 6px;
+			top: 6px;
+			width: 38px;
+			height: 38px;
+			border: 0;
+			border-radius: 5px;
+			background: transparent;
+			color: var(--muted);
 			cursor: pointer;
-			transition: all 0.3s ease;
-			box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 		}
-
-		.btn-verify:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+		.reveal-token:hover { color: var(--pine); background: #edf1e9; }
+		.reveal-token:focus-visible, .verify-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+		.verify-btn {
+			width: 100%;
+			min-height: 50px;
+			padding: 12px 18px;
+			border: 1px solid var(--pine);
+			border-radius: 6px;
+			background: var(--pine);
+			color: #fffdf7;
+			font: 600 14px var(--sans);
+			letter-spacing: .02em;
+			cursor: pointer;
+			transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
 		}
-
-		.btn-verify:active {
-			transform: translateY(0);
-		}
-
-		.btn-verify:disabled {
-			opacity: 0.6;
-			cursor: not-allowed;
-			transform: none;
-		}
-
-		.message {
-			margin-top: 16px;
-			padding: 12px 16px;
-			border-radius: 8px;
-			font-size: 14px;
-			display: none;
-			animation: fadeIn 0.3s ease;
-		}
-
-		@keyframes fadeIn {
-			from {
-				opacity: 0;
-				transform: translateY(-10px);
-			}
-			to {
-				opacity: 1;
-				transform: translateY(0);
-			}
-		}
-
-		.message.error {
-			background: #fee;
-			color: #c0392b;
-			border: 1px solid #f5c6cb;
-		}
-
-		.message.success {
-			background: #d4edda;
-			color: #155724;
-			border: 1px solid #c3e6cb;
-		}
-
-		.auth-footer {
-			text-align: center;
-			padding: 20px;
-			background: #f8f9fa;
-			color: #7f8c8d;
-			font-size: 13px;
-		}
-
-		.loading-spinner {
-			display: inline-block;
-			width: 16px;
-			height: 16px;
-			border: 2px solid rgba(255, 255, 255, 0.3);
-			border-radius: 50%;
-			border-top-color: white;
-			animation: spin 0.8s linear infinite;
-			margin-right: 8px;
-			vertical-align: middle;
-		}
-
-		@keyframes spin {
-			to {
-				transform: rotate(360deg);
-			}
-		}
-
-		@media (max-width: 480px) {
-			.auth-container {
-				margin: 0;
-				border-radius: 12px;
-			}
-
-			.auth-header {
-				padding: 30px 20px;
-			}
-
-			.auth-header h1 {
-				font-size: 24px;
-			}
-
-			.auth-body {
-				padding: 30px 20px;
-			}
-		}
+		.verify-btn:hover:not(:disabled) { background: var(--pine-deep); box-shadow: 0 5px 14px rgba(16,47,38,.16); transform: translateY(-1px); }
+		.verify-btn:active:not(:disabled) { transform: translateY(0); }
+		.verify-btn:disabled { opacity: .72; cursor: progress; }
+		.message { display: none; margin-top: 15px; padding: 12px 14px; border: 1px solid transparent; border-radius: 5px; font-size: 13px; line-height: 1.55; }
+		.message.error { display: block; border-color: #e8c8c3; background: #fbefeb; color: var(--danger); }
+		.message.success { display: block; border-color: #c6d8c9; background: #edf4ed; color: var(--pine); }
+		.message[hidden] { display: none; }
+		.help-line { display: flex; align-items: flex-start; gap: 10px; margin-top: 24px; padding-top: 19px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; line-height: 1.7; }
+		.help-dot { flex: 0 0 7px; width: 7px; height: 7px; margin-top: 6px; border-radius: 50%; background: var(--accent); }
+		.auth-footer { margin-top: 19px; color: #728077; text-align: center; font-size: 11px; letter-spacing: .04em; }
+		.loading-spinner { display: inline-block; width: 15px; height: 15px; margin: 0 9px -3px 0; border: 2px solid rgba(255,253,247,.35); border-top-color: #fffdf7; border-radius: 50%; animation: spin .7s linear infinite; }
+		@keyframes spin { to { transform: rotate(360deg); } }
+		@keyframes arrive { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+		@media (max-width: 480px) { body { padding: 22px 16px; } .brand { margin-left: 2px; margin-bottom: 16px; } }
+		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; } }
 	</style>
 </head>
 <body>
-	<div class="auth-container">
-		<div class="auth-header">
-			<h1>🔐 访问验证</h1>
-			<p>请输入访问令牌以继续使用</p>
-		</div>
-
-		<div class="auth-body">
-			<div class="info-box">
-				<strong>💡 什么是访问令牌？</strong>
-				<p>访问令牌是用于保护此应用的安全密钥。请联系管理员获取有效的访问令牌。</p>
+	<main class="auth-shell">
+		<div class="brand" aria-label="Clash Sub">
+			<div class="brand-mark" aria-hidden="true">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h6l3 5h7M4 17h6l3-5"/><circle cx="4" cy="7" r="1.5"/><circle cx="4" cy="17" r="1.5"/><circle cx="20" cy="12" r="1.5"/></svg>
 			</div>
-
+			<div class="brand-copy"><span class="brand-name">Clash Sub</span><span class="brand-caption">Subscription workspace</span></div>
+		</div>
+		<section class="auth-card" aria-labelledby="pageTitle">
+			<p class="eyebrow">Private workspace</p>
+			<h1 id="pageTitle">访问验证</h1>
+			<p class="intro">请输入访问令牌，继续管理你的节点与订阅集合。</p>
 			<form id="authForm">
 				<div class="form-group">
 					<label for="token">访问令牌</label>
-					<div class="input-wrapper">
-						<span class="input-icon">🔑</span>
-						<input
-							type="password"
-							id="token"
-							name="token"
-							class="form-control"
-							placeholder="请输入访问令牌"
-							required
-							autocomplete="off"
-						>
+					<div class="input-wrap">
+						<input type="password" id="token" name="token" placeholder="输入令牌" required autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="tokenHelp message">
+						<button class="reveal-token" type="button" id="toggleToken" aria-label="显示令牌" aria-pressed="false">
+							<svg id="eyeIcon" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.6"/></svg>
+						</button>
 					</div>
 				</div>
-
-				<button type="submit" class="btn-verify" id="verifyBtn">
-					验证令牌
-				</button>
-
-				<div id="message" class="message"></div>
+				<button type="submit" class="verify-btn" id="verifyBtn">验证令牌 <span aria-hidden="true">→</span></button>
+				<div id="message" class="message" role="status" aria-live="polite" hidden></div>
 			</form>
-		</div>
-
-		<div class="auth-footer">
-			© 2025 Clash订阅生成器 · 安全访问
-		</div>
-	</div>
-
+			<div class="help-line" id="tokenHelp"><span class="help-dot" aria-hidden="true"></span><span>令牌由此应用的管理员提供。验证成功后将返回你原先访问的页面。</span></div>
+		</section>
+		<footer class="auth-footer">Clash Sub <span aria-hidden="true">·</span> 节点与订阅管理</footer>
+	</main>
 	<script>
 		const form = document.getElementById('authForm');
 		const verifyBtn = document.getElementById('verifyBtn');
 		const messageEl = document.getElementById('message');
 		const tokenInput = document.getElementById('token');
+		const toggleToken = document.getElementById('toggleToken');
+		const defaultButtonLabel = '验证令牌';
 
-		// 显示消息
 		function showMessage(text, type = 'error') {
 			messageEl.textContent = text;
 			messageEl.className = `message ${type}`;
-			messageEl.style.display = 'block';
-
-			if (type === 'success') {
-				setTimeout(() => {
-					messageEl.style.display = 'none';
-				}, 3000);
-			}
+			messageEl.hidden = false;
 		}
 
-		// 处理表单提交
-		form.addEventListener('submit', async (e) => {
-			e.preventDefault();
+		toggleToken.addEventListener('click', () => {
+			const visible = tokenInput.type === 'password';
+			tokenInput.type = visible ? 'text' : 'password';
+			toggleToken.setAttribute('aria-pressed', String(visible));
+			toggleToken.setAttribute('aria-label', visible ? '隐藏令牌' : '显示令牌');
+		});
 
+		form.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			if (verifyBtn.disabled) return;
 			const token = tokenInput.value.trim();
-
 			if (!token) {
 				showMessage('请输入访问令牌');
+				tokenInput.focus();
 				return;
 			}
 
-			// 禁用按钮，显示加载状态
 			verifyBtn.disabled = true;
-			verifyBtn.innerHTML = '<span class="loading-spinner"></span>验证中...';
-
+			verifyBtn.innerHTML = '<span class="loading-spinner" aria-hidden="true"></span>验证中…';
+			messageEl.hidden = true;
 			try {
 				const response = await fetch('/api/verify-token', {
 					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
+					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ token })
 				});
-
 				const result = await response.json();
-
 				if (result.success) {
-					showMessage('验证成功，正在跳转...', 'success');
-
-					// 获取重定向URL
+					showMessage('验证成功，正在跳转…', 'success');
 					const urlParams = new URLSearchParams(window.location.search);
-					let redirect = urlParams.get('redirect') || '/';
-
-					// 用 URL 解析做同源约束(防止被构造成开放重定向), 只取 path + search
+					const redirect = urlParams.get('redirect') || '/';
 					const redirectUrl = new URL(redirect, window.location.origin);
 					const target = redirectUrl.pathname + redirectUrl.search;
-
-					// 延迟跳转，让用户看到成功消息
-					setTimeout(() => {
-						window.location.href = target;
-					}, 500);
+					setTimeout(() => { window.location.href = target; }, 500);
 				} else {
 					showMessage(result.message || '令牌验证失败，请检查令牌是否正确');
 					verifyBtn.disabled = false;
-					verifyBtn.textContent = '验证令牌';
+					verifyBtn.textContent = defaultButtonLabel;
 					tokenInput.select();
 				}
 			} catch (error) {
 				showMessage('验证失败，请稍后重试');
 				verifyBtn.disabled = false;
-				verifyBtn.textContent = '验证令牌';
+				verifyBtn.textContent = defaultButtonLabel;
 			}
 		});
 
-		// 页面加载时聚焦输入框
-		window.addEventListener('load', () => {
-			tokenInput.focus();
-		});
-
-		// Enter 键提交表单
-		tokenInput.addEventListener('keypress', (e) => {
-			if (e.key === 'Enter') {
-				form.dispatchEvent(new Event('submit'));
-			}
-		});
+		window.addEventListener('load', () => tokenInput.focus());
 	</script>
 </body>
 </html>

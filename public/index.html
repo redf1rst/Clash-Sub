@@ -4,7 +4,8 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Clash Sub</title>
+	<title>Clash Sub · 订阅管理</title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&amp;family=Noto+Sans+SC:wght@400;500;600;700&amp;display=swap">
 	<link rel="icon" type="image/png" href="https://github.com/redf1rst/clash-sub/blob/main/img/clash-sub.png?raw=true">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css" />
 	<script>
@@ -42,1705 +43,249 @@
 		})();
 	</script>
 	<style>
-		* {
-			margin: 0;
-			padding: 0;
-			box-sizing: border-box;
+		:root {
+			color-scheme: light;
+			--canvas: #f5f2e9;
+			--paper: #fffdf7;
+			--ink: #192d26;
+			--pine: #174637;
+			--pine-deep: #102f26;
+			--muted: #52655b;
+			--line: #d6ddd1;
+			--control-line: #84968b;
+			--accent: #e7bd76;
+			--sage: #e8efe5;
+			--danger: #8b332d;
+			--danger-bg: #faeae5;
+			--radius: 12px;
+			--font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+			--font-display: 'Fraunces', Georgia, serif;
+			--font-mono: ui-monospace, Consolas, monospace;
 		}
 
-		body {
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', 'Apple Color Emoji', Roboto, sans-serif;
-			background: #F5F5F0;
-			min-height: 100vh;
-			padding: 20px;
-		}
+		*, *::before, *::after { box-sizing: border-box; }
+		body { margin: 0; min-height: 100vh; background: var(--canvas); color: var(--ink); font: 1rem/1.6 var(--font-body); }
+		body:has(dialog[open]) { overflow: hidden; }
+		button, input, textarea { font: inherit; }
+		button, input, textarea { color: inherit; }
+		:focus-visible { outline: 3px solid var(--pine); outline-offset: 3px; }
+		[hidden] { display: none !important; }
+		h1, h2, h3, p { margin: 0; }
 
-		@keyframes gradientShift {
-			0% {
-				background-position: 0% 50%;
-			}
-
-			50% {
-				background-position: 100% 50%;
-			}
-
-			100% {
-				background-position: 0% 50%;
-			}
-		}
-
-		.container {
-			max-width: 1200px;
-			margin: 0 auto;
-			background: #FFFFFF;
-			border-radius: 12px;
-			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-			overflow: hidden;
-		}
-
+		.container { max-width: 76rem; margin-inline: auto; padding: clamp(1rem, 4vw, 3rem); }
 		.header {
-			background: linear-gradient(135deg, #6B8E9F 0%, #9CAE9A 100%);
-			color: white;
-			padding: 30px;
-			text-align: center;
-			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-		}
-
-		.header h1 {
-			font-size: 2.5em;
-			margin-bottom: 10px;
-		}
-
-		.header p {
-			opacity: 0.8;
-			font-size: 1.1em;
-		}
-
-		.tabs {
 			display: flex;
-			background: #958E9E;
-		}
-
-		.tab {
-			flex: 1;
-			padding: 20px;
-			text-align: center;
-			color: #000;
-			cursor: pointer;
-			transition: background 0.3s;
-			border: none;
-			font-size: 1.1em;
-			background: #E8E6EA;
-		}
-
-		.tab.active {
-			background: #6B8E9F;
-			color: white;
-		}
-
-		.tab:hover {
-			background: #5A7A8A;
-			color: white;
-		}
-
-		.content {
-			padding: 30px;
-		}
-
-		.section {
-			display: none;
-		}
-
-		.section.active {
-			display: block;
-		}
-
-		.input-group {
-			margin-bottom: 25px;
-		}
-
-		.input-group label {
-			display: block;
-			margin-bottom: 8px;
-			font-weight: 600;
-			color: #2c3e50;
-		}
-
-		.input-group input,
-		.input-group textarea,
-		.input-group select {
-			width: 100%;
-			padding: 12px 15px;
-			border: 2px solid #e0e0e0;
-			border-radius: 8px;
-			font-size: 1em;
-			transition: border-color 0.3s;
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', 'Apple Color Emoji', Arial, sans-serif;
-			background: #FFFFFF;
-		}
-
-		.input-group textarea {
-			min-height: 120px;
-			resize: vertical;
-		}
-
-		.input-group input:focus,
-		.input-group textarea:focus,
-		.input-group select:focus {
-			outline: none;
-			border-color: #6B8E9F;
-		}
-
-		.input-group select {
-			cursor: pointer;
-		}
-
-		/* 自定义下拉菜单样式 */
-		.custom-select {
-			position: relative;
-			width: 100%;
-		}
-
-		.select-display {
-			width: 100%;
-			padding: 12px 15px;
-			border: 2px solid #e0e0e0;
-			border-radius: 8px;
-			font-size: 1em;
-			background: #FFFFFF;
-			cursor: pointer;
-			display: flex;
+			align-items: center;
 			justify-content: space-between;
-			align-items: center;
-			transition: border-color 0.3s;
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', 'Apple Color Emoji', Arial, sans-serif;
-		}
-
-		.select-display:hover {
-			border-color: #6B8E9F;
-		}
-
-		.select-display.active {
-			border-color: #6B8E9F;
-			border-bottom-left-radius: 0;
-			border-bottom-right-radius: 0;
-		}
-
-		.select-arrow {
-			transition: transform 0.3s;
-			color: #666;
-		}
-
-		.select-display.active .select-arrow {
-			transform: rotate(180deg);
-		}
-
-		.select-options {
-			position: absolute;
-			top: 100%;
-			left: 0;
-			right: 0;
-			background: #FFFFFF;
-			border: 2px solid #6B8E9F;
-			border-top: none;
-			border-radius: 0 0 8px 8px;
-			max-height: 200px;
-			overflow-y: auto;
-			z-index: 1000;
-			display: none;
-			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-		}
-
-		.select-options.show {
-			display: block;
-		}
-
-		.select-option {
-			padding: 12px 15px;
-			cursor: pointer;
-			transition: background-color 0.2s;
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', 'Apple Color Emoji', Arial, sans-serif;
-			display: flex;
-			align-items: center;
-			gap: 8px;
-		}
-
-		.select-option .fi {
-			width: 20px;
-			height: 15px;
-			border-radius: 2px;
-		}
-
-		.select-option:hover {
-			background-color: #F5F5F0;
-		}
-
-		.select-option.selected {
-			background-color: #6B8E9F;
-			color: white;
-		}
-
-		.btn {
-			background: #6B8E9F;
-			color: white;
-			border: none;
-			padding: 12px 25px;
-			border-radius: 8px;
-			cursor: pointer;
-			font-size: 1em;
-			transition: background 0.3s;
-			margin-right: 10px;
-			margin-bottom: 10px;
-		}
-
-		.btn:hover {
-			background: #5A7A8A;
-		}
-
-		.btn.danger {
-			background: #C59292;
-		}
-
-		.btn.danger:hover {
-			background: #B37F7F;
-		}
-
-		.btn.success {
-			background: #9CAE9A;
-		}
-
-		.btn.success:hover {
-			background: #8A9B88;
-		}
-
-		.list {
-			background: #F5F5F0;
-			border-radius: 8px;
-			padding: 20px;
-			margin-top: 20px;
-		}
-
-		.list-item {
-			background: #FFFFFF;
-			padding: 15px;
-			margin-bottom: 10px;
-			border-radius: 6px;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-			transition: all 0.3s ease;
-		}
-
-		.list-item:last-child {
-			margin-bottom: 0;
-		}
-
-		.item-actions {
-			display: flex;
-			gap: 8px;
-			flex-shrink: 0;
-		}
-
-		/* 新添加项目的高亮样式 */
-		.list-item.newly-added {
-			background: #9CAE9A;
-			border: 2px solid #9CAE9A;
-			box-shadow: 0 4px 8px rgba(39, 174, 96, 0.2);
-			animation: highlightPulse 3s ease-in-out;
-			scroll-margin-top: 20px;
-			/* 滚动时的顶部边距 */
-		}
-
-		@keyframes highlightPulse {
-			0% {
-				transform: scale(1);
-				box-shadow: 0 4px 8px rgba(39, 174, 96, 0.2);
-			}
-
-			25% {
-				transform: scale(1.02);
-				box-shadow: 0 6px 12px rgba(39, 174, 96, 0.3);
-			}
-
-			50% {
-				transform: scale(1);
-				box-shadow: 0 4px 8px rgba(39, 174, 96, 0.2);
-			}
-
-			75% {
-				transform: scale(1.01);
-				box-shadow: 0 5px 10px rgba(39, 174, 96, 0.25);
-			}
-
-			100% {
-				transform: scale(1);
-				box-shadow: 0 4px 8px rgba(39, 174, 96, 0.2);
-			}
-		}
-
-		.item-info {
-			flex: 1;
-		}
-
-		.item-name {
-			font-weight: 600;
-			color: #2c3e50;
-			margin-bottom: 5px;
-			display: flex;
-			align-items: center;
-			gap: 8px;
-		}
-
-		.btn-icon {
-			background: none;
-			border: none;
-			cursor: pointer;
-			font-size: 16px;
-			padding: 2px 6px;
-			border-radius: 4px;
-			transition: background-color 0.2s;
-			opacity: 0.7;
-		}
-
-		.btn-icon:hover {
-			background-color: rgba(0, 0, 0, 0.05);
-			opacity: 1;
-		}
-
-		.item-details {
-			color: #7f8c8d;
-			font-size: 0.9em;
-			/* 限制宽度避免挤占编辑按钮位置，支持多行显示 */
-			max-width: calc(100% - 120px);
-			word-wrap: break-word;
-			word-break: break-all;
-			line-height: 1.4;
-		}
-
-		.subscription-links {
-			background: #DDE8DD;
-			padding: 20px;
-			border-radius: 8px;
-			margin-top: 20px;
-		}
-
-		.subscription-links h3 {
-			color: #9CAE9A;
-			margin-bottom: 15px;
-		}
-
-		.link-item {
-			background: #FFFFFF;
-			padding: 15px;
-			border-radius: 6px;
-			margin-bottom: 10px;
-			border-left: 4px solid #9CAE9A;
-		}
-
-		.link-item:last-child {
-			margin-bottom: 0;
-		}
-
-		.link-url {
-			font-family: monospace;
-			background: #f1f2f6;
-			padding: 8px 12px;
-			border-radius: 4px;
-			word-break: break-all;
-			margin-top: 8px;
-		}
-
-		.message {
-			padding: 12px 15px;
-			border-radius: 6px;
-			margin-bottom: 15px;
-			display: none;
-			white-space: pre-line;
-			/* 支持换行显示 */
-			font-weight: 500;
-		}
-
-		.message.success {
-			background: #DDE8DD;
-			color: #155724;
-			border: 1px solid #9CAE9A;
-		}
-
-		.message.error {
-			background: #E8CFCF;
-			color: #5A5A5A;
-			border: 1px solid #C59292;
-		}
-
-		.message.info {
-			background: #D9E5E9;
-			color: #0c5460;
-			border: 1px solid #6B8E9F;
-		}
-
-		/* 按钮和消息的横向布局 */
-		.action-bar {
-			display: flex;
-			align-items: flex-start;
-			gap: 15px;
-			margin-bottom: 20px;
-		}
-
-		.action-buttons {
-			display: flex;
-			gap: 10px;
-			flex-wrap: wrap;
-		}
-
-		.action-message {
-			flex: 1;
-			min-width: 0;
-		}
-
-		.action-message .message {
-			margin: 0;
-			max-height: 200px;
-			overflow-y: auto;
-		}
-
-		.empty-state {
-			text-align: center;
-			color: #7f8c8d;
-			padding: 40px;
-		}
-
-		.empty-state i {
-			font-size: 3em;
-			margin-bottom: 15px;
-			opacity: 0.5;
-		}
-
-		@media (max-width: 768px) {
-
-			/* 容器优化 */
-			.container {
-				margin: 10px;
-				border-radius: 8px;
-			}
-
-			.header {
-				padding: 20px;
-			}
-
-			.header h1 {
-				font-size: 2em;
-			}
-
-			.content {
-				padding: 15px;
-				/* 减少内边距 */
-			}
-
-			/* 标签页优化 - 保持水平布局但调整字体 */
-			.tab {
-				padding: 15px 10px;
-				font-size: 0.9em;
-			}
-
-			/* 列表项布局优化 */
-			.list-item {
-				flex-direction: column;
-				align-items: flex-start;
-				padding: 12px;
-				/* 减少内边距 */
-			}
-
-			/* 按钮区域：两行布局 */
-			.item-actions {
-				display: flex;
-				flex-direction: column;
-				gap: 8px;
-				width: 100%;
-				margin-top: 12px;
-			}
-
-			/* 第一行：导入Clash和复制链接 */
-			.item-actions-row-1 {
-				display: flex;
-				gap: 8px;
-			}
-
-			/* 第二行：管理、重命名、删除 */
-			.item-actions-row-2 {
-				display: flex;
-				gap: 6px;
-			}
-
-			/* 第一行按钮样式 */
-			.item-actions-row-1 .btn {
-				flex: 1;
-				padding: 8px 12px;
-				font-size: 0.85em;
-				margin: 0;
-				text-align: center;
-				white-space: nowrap;
-				min-height: 36px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
-
-			/* 第二行按钮样式（更紧凑） */
-			.item-actions-row-2 .btn {
-				flex: 1;
-				padding: 6px 8px;
-				font-size: 0.8em;
-				margin: 0;
-				text-align: center;
-				white-space: nowrap;
-				min-height: 32px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
-
-			/* 订阅集合第一行有3个按钮的特殊样式 */
-			#subCollectionList .item-actions-row-1 {
-				display: flex;
-				gap: 6px;
-				/* 稍微缩小间距 */
-			}
-
-			#subCollectionList .item-actions-row-1 .btn {
-				flex: 1;
-				padding: 7px 6px;
-				/* 稍微调整padding */
-				font-size: 0.8em;
-				/* 稍微缩小字体 */
-				min-height: 36px;
-			}
-
-			/* 订阅集合第二行有3个按钮的样式 */
-			#subCollectionList .item-actions-row-2 {
-				display: flex;
-				gap: 6px;
-			}
-
-			#subCollectionList .item-actions-row-2 .btn {
-				flex: 1;
-				padding: 6px 6px;
-				/* 保持紧凑 */
-				font-size: 0.8em;
-				min-height: 32px;
-			}
-
-			/* 操作栏优化 */
-			.action-bar {
-				flex-direction: column;
-				gap: 10px;
-			}
-
-			.action-buttons {
-				gap: 8px;
-			}
-
-			.action-buttons .btn {
-				padding: 10px 16px;
-				font-size: 0.9em;
-			}
-
-			/* 模态框优化 */
-			.modal-content {
-				width: 95%;
-				margin: 2% auto;
-			}
-
-			.modal-body {
-				padding: 15px;
-			}
-
-			/* 输入框优化 */
-			.input-group {
-				margin-bottom: 20px;
-			}
-
-			.input-group input,
-			.input-group textarea,
-			.input-group select {
-				font-size: 16px;
-				/* 防止iOS缩放 */
-			}
-		}
-
-		/* 超小屏幕优化（小于480px） */
-		@media (max-width: 480px) {
-			.header h1 {
-				font-size: 1.8em;
-			}
-
-			.content {
-				padding: 12px;
-			}
-
-			.item-actions .btn {
-				padding: 6px 8px;
-				font-size: 0.8em;
-				min-height: 32px;
-			}
-
-			.tab {
-				padding: 12px 8px;
-				font-size: 0.85em;
-			}
-		}
-
-		/* 进度条样式 */
-		.progress-container {
-			margin-top: 15px;
-			padding: 0;
-			background: transparent;
-			border-radius: 0;
-			border: none;
-		}
-
-		.progress-bar {
-			width: 100%;
-			height: 30px;
-			background-color: #e9ecef;
-			border-radius: 15px;
+			gap: 2rem;
+			padding: clamp(1.5rem, 5vw, 4rem);
 			overflow: hidden;
-			position: relative;
-			border: 2px solid #dee2e6;
+			border-radius: 20px;
+			background: var(--pine-deep);
+			color: var(--paper);
 		}
-
-		.progress-fill {
-			height: 100%;
-			background: #9CAE9A;
-			border-radius: 13px;
-			width: 0%;
-			transition: width 0.5s ease-in-out;
+		.header h1 { font: 700 clamp(2.65rem, 7vw, 5.4rem)/1.02 var(--font-display); letter-spacing: -.04em; }
+		.header p { margin-top: .85rem; color: #dde8dd; }
+		.brand-mark {
 			position: relative;
-			display: flex;
+			flex: 0 0 8rem;
+			height: 8rem;
+			border: 1px solid #759187;
+			border-radius: 50%;
+			background: repeating-radial-gradient(circle, transparent 0 13px, #759187 14px 15px, transparent 16px 22px);
+		}
+		.brand-mark::after { content: ''; position: absolute; inset: 0; margin: auto; width: .75rem; height: .75rem; border-radius: 50%; background: var(--accent); }
+		.tabs { display: flex; gap: .25rem; margin-block: 1.25rem; padding: .25rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+		.tab { flex: 1; min-height: 44px; border: 0; border-radius: 8px; background: transparent; font-weight: 700; cursor: pointer; }
+		.tab:hover { background: var(--sage); }
+		.tab.active { color: var(--paper); background: var(--pine); }
+		.section { display: none; }
+		.section.active { display: block; }
+		.section-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+		.section-head h2 { font-size: clamp(1.35rem, 3vw, 1.9rem); line-height: 1.25; }
+		.section-head p { margin-top: .35rem; color: var(--muted); }
+
+		.btn, .confirm-btn, .btn-icon, .close {
+			display: inline-flex;
+			min-height: 44px;
 			align-items: center;
 			justify-content: center;
-		}
-
-		.progress-text {
-			color: white;
-			font-weight: bold;
-			font-size: 14px;
-			text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			padding: 0 10px;
-		}
-
-		/* 操作输出框样式 */
-		.operation-output {
-			margin: 15px 0;
-			border: 1px solid #dee2e6;
+			padding: .45rem .85rem;
+			border: 1px solid var(--control-line);
 			border-radius: 8px;
-			background: #F5F5F0;
-			max-height: 400px;
-			overflow: hidden;
-			width: 100%;
-		}
-
-		.output-header {
-			background: #e9ecef;
-			padding: 10px 15px;
-			border-bottom: 1px solid #dee2e6;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			font-weight: bold;
-			font-size: 14px;
-		}
-
-		.btn-close {
-			background: none;
-			border: none;
-			font-size: 18px;
+			background: var(--paper);
+			color: var(--pine);
+			font-size: .875rem;
+			font-weight: 700;
+			text-align: center;
 			cursor: pointer;
-			color: #6c757d;
-			padding: 0;
-			width: 20px;
-			height: 20px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-
-		.btn-close:hover {
-			color: #dc3545;
-		}
-
-		.output-content {
-			padding: 15px;
-			max-height: 350px;
-			overflow-y: auto;
-			font-family: 'Courier New', monospace;
-			font-size: 13px;
-			line-height: 1.5;
-			white-space: pre-wrap;
-			word-wrap: break-word;
-			background: #ffffff;
-			border-top: 1px solid #dee2e6;
-		}
-
-		.progress-fill::after {
-			content: '';
-			position: absolute;
-			top: 0;
-			left: 0;
-			bottom: 0;
-			right: 0;
-			background: linear-gradient(90deg,
-					transparent,
-					rgba(255, 255, 255, 0.2),
-					transparent);
-			animation: shimmer 2s infinite;
-		}
-
-		@keyframes shimmer {
-			0% {
-				transform: translateX(-100%);
-			}
-
-			100% {
-				transform: translateX(100%);
-			}
-		}
-
-		.btn:disabled {
-			background: #6c757d;
-			cursor: not-allowed;
-			opacity: 0.6;
-		}
-
-		.btn:disabled:hover {
-			background: #6c757d;
-		}
-
-		/* 复制链接区域样式 */
-		.copy-links-container {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 15px;
-			margin: 20px 0;
-		}
-
-		.copy-link-single {
-			display: flex;
-			justify-content: center;
-			margin: 0 0 20px 0;
-		}
-
-		.copy-links-container .link-item,
-		.copy-link-single .link-item {
-			background: #6B8E9F;
-			border: 1px solid #A8BBC5;
-			border-radius: 8px;
-			padding: 10px;
-			display: flex;
-			flex-direction: column;
-			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-			transition: all 0.2s ease;
-		}
-
-		.copy-link-single .link-item {
-			width: 100%;
-			max-width: 750px;
-		}
-
-		.copy-links-container .link-item:hover,
-		.copy-link-single .link-item:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-		}
-
-		.copy-links-container .link-item strong,
-		.copy-link-single .link-item strong {
-			font-size: 15px;
-			color: #6B8E9F;
-			margin-bottom: 6px;
-			font-weight: 600;
-			text-align: center;
-		}
-
-		.copy-links-container .link-url,
-		.copy-link-single .link-url {
-			background: rgba(255, 255, 255, 0.8);
-			border: 1px solid #8BA4AE;
-			border-radius: 6px;
-			padding: 6px 10px;
-			font-family: 'Courier New', monospace;
-			font-size: 13px;
-			word-break: break-all;
-			color: #424242;
-			flex: 1;
-			margin-bottom: 8px;
-			min-height: 28px;
-			display: flex;
-			align-items: center;
-			line-height: 1.3;
-		}
-
-		.copy-links-container .btn,
-		.copy-link-single .btn {
-			background: #6B8E9F;
-			color: white;
-			border: none;
-			font-size: 13px;
-			font-weight: 500;
-			padding: 6px 16px;
-			height: 30px;
-			border-radius: 6px;
-			transition: all 0.2s ease;
-		}
-
-		.copy-links-container .btn:hover,
-		.copy-link-single .btn:hover {
-			background: #5A7A8A;
-			transform: translateY(-1px);
-			box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3);
-		}
-
-		@media (max-width: 768px) {
-			.copy-links-container {
-				grid-template-columns: 1fr;
-				gap: 12px;
-				margin: 15px 0;
-			}
-
-			.copy-link-single .link-item {
-				max-width: none;
-			}
-
-			/* 移动端适配：信息区域可以使用全宽，因为按钮在下方 */
-			.item-details {
-				max-width: 100%;
-			}
-
-			/* 移动端复选框布局优化 */
-			.list-item .item-name {
-				display: flex;
-				align-items: center;
-				gap: 8px;
-			}
-
-			.list-item .item-name .checkbox-wrapper {
-				flex-shrink: 0;
-				width: 20px;
-				height: 20px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
-
-			/* 移动端管理节点删除按钮 - 改为横向排布 */
-			.node-delete-btn {
-				padding: 6px 10px !important;
-				font-size: 0.85em !important;
-				flex-shrink: 0;
-				margin-left: 8px;
-				white-space: nowrap;
-				/* 防止按钮文字换行 */
-			}
-
-			/* 管理节点中限制信息宽度 */
-			#collectionProxyList .item-info {
-				max-width: calc(100% - 40px);
-			}
-
-			/* 管理订阅按钮布局 */
-			#collectionSubList .item-actions {
-				display: flex;
-				gap: 6px;
-				margin-top: 8px;
-				width: 100%;
-			}
-
-			#collectionSubList .item-actions .btn {
-				flex: 1;
-				padding: 6px 10px;
-				font-size: 0.85em;
-			}
-
-			.list-item .item-name .name-text {
-				flex: 1;
-				min-width: 0;
-				text-align: left;
-			}
-
-			/* 移动端信息区域左对齐 */
-			.item-info {
-				text-align: left;
-				width: 100%;
-				display: flex;
-				flex-direction: column;
-				align-items: flex-start;
-			}
-
-			.item-details {
-				text-align: left;
-				margin-left: 28px;
-			}
-
-			/* 主界面集合列表完全左对齐 */
-			#collectionList .item-info,
-			#subCollectionList .item-info {
-				text-align: left;
-			}
-
-			#collectionList .item-name,
-			#subCollectionList .item-name {
-				text-align: left;
-				margin-left: 0;
-			}
-
-			#collectionList .item-details,
-			#subCollectionList .item-details {
-				text-align: left;
-				margin-left: 0;
-			}
-
-			/* 隐藏原来位置的复选框 */
-			.list-item>.collection-proxy-checkbox,
-			.list-item>.collection-subscription-checkbox {
-				display: none;
-			}
-		}
-
-		/* 选择功能样式 */
-		.proxy-checkbox,
-		.subscription-checkbox,
-		.collection-proxy-checkbox,
-		.collection-subscription-checkbox {
-			margin-right: 12px;
-			transform: scale(1.2);
-			cursor: pointer;
-			accent-color: #6B8E9F;
-		}
-
-		/* 桌面端管理订阅界面订阅链接显示优化 */
-		@media (min-width: 769px) {
-			#collectionSubList .list-item {
-				position: relative;
-				overflow: visible;
-				/* 允许item-details溢出 */
-			}
-
-			#collectionSubList .item-info {
-				position: relative;
-				z-index: 1;
-				/* 确保信息区域在上层 */
-			}
-
-			#collectionSubList .item-details {
-				max-width: calc(100% + 100px);
-				/* 向右延伸100px */
-				width: auto;
-				word-wrap: break-word;
-				word-break: break-all;
-				white-space: normal;
-				/* 允许换行 */
-				line-height: 1.4;
-				padding-right: 10px;
-				/* 添加右内边距，避免贴边 */
-			}
-
-			#collectionSubList .item-actions {
-				position: relative;
-				z-index: 2;
-				/* 确保按钮在最上层，不被遮挡 */
-				margin-top: 10px;
-				/* 与上方内容保持间距 */
-			}
-		}
-
-		/* 桌面端隐藏移动端复选框 */
-		.mobile-checkbox {
-			display: none;
-		}
-
-		/* 桌面端复选框样式 */
-		.desktop-checkbox {
-			display: block;
-		}
-
-		/* 移动端复选框样式 */
-		@media (max-width: 768px) {
-
-			/* 显示移动端复选框，隐藏原位置复选框 */
-			.mobile-checkbox {
-				display: block;
-				margin: 0;
-				transform: scale(1.2);
-				position: relative;
-				top: 0;
-				left: 0;
-				pointer-events: auto;
-				z-index: 10;
-				-webkit-tap-highlight-color: transparent;
-				touch-action: manipulation;
-			}
-
-			/* 隐藏原来位置的复选框 */
-			.list-item>.collection-proxy-checkbox:not(.mobile-checkbox),
-			.list-item>.collection-subscription-checkbox:not(.mobile-checkbox) {
-				display: none;
-			}
-
-			/* 移动端节点和订阅集合中的布局 */
-			#collectionProxyList .list-item,
-			#collectionSubList .list-item {
-				display: flex;
-				flex-direction: column;
-				position: relative;
-				padding: 12px;
-			}
-
-			/* 复选框定位在名称和详情的中间高度 */
-			#collectionProxyList .checkbox-wrapper,
-			#collectionSubList .checkbox-wrapper {
-				position: absolute;
-				left: 15px;
-				/* 恢复复选框左边距 */
-				top: 28px;
-				/* 调整到名称和链接的中间位置 */
-				z-index: 10;
-			}
-
-			/* 移动端管理节点界面信息区域调整 */
-			#collectionProxyList .item-info {
-				margin-left: 0px;
-				/* 信息区域从左边界开始 */
-				margin-right: 10px;
-				/* 右侧留出空间 */
-				width: calc(100% - 10px);
-				/* 占据几乎全部宽度 */
-				margin-bottom: 10px;
-				/* 与按钮保持间距 */
-				padding-left: -15px;
-				/* 负内边距，让内容更靠左 */
-			}
-
-			/* 移动端管理订阅界面信息区域调整 - 需要为复选框留出空间 */
-			#collectionSubList .item-info {
-				margin-left: 40px;
-				/* 为复选框留出空间，避免重叠 */
-				margin-right: 10px;
-				/* 右侧留出空间 */
-				width: calc(100% - 60px);
-				/* 减去左右边距，确保不超出卡片 */
-				margin-bottom: 10px;
-				/* 与按钮保持间距 */
-				padding-left: 0px;
-				/* 移除内边距 */
-			}
-
-			/* 名称样式优化 */
-			#collectionProxyList .item-name,
-			#collectionSubList .item-name {
-				display: block;
-				font-weight: 600;
-				color: #2c3e50;
-				margin-bottom: 5px;
-				word-wrap: break-word;
-				word-break: break-all;
-				line-height: 1.4;
-			}
-
-			/* 移动端节点详情样式优化，防止内容超出 */
-			#collectionProxyList .item-details {
-				margin-left: 0;
-				color: #7f8c8d;
-				font-size: 0.85em;
-				word-wrap: break-word;
-				word-break: break-all;
-				line-height: 1.3;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				display: -webkit-box;
-				-webkit-line-clamp: 2;
-				/* 最多显示2行 */
-				line-clamp: 2;
-				/* 标准属性，增强兼容性 */
-				-webkit-box-orient: vertical;
-			}
-
-			/* 移动端订阅链接样式优化，显示完整链接 */
-			#collectionSubList .item-details {
-				margin-left: 0;
-				color: #7f8c8d;
-				font-size: 0.85em;
-				word-wrap: break-word;
-				word-break: break-all;
-				line-height: 1.3;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				display: -webkit-box;
-				line-clamp: 4;
-				/* 最多显示4行，确保长链接显示完整 */
-				-webkit-box-orient: vertical;
-			}
-
-			/* 按钮区域确保不会与复选框重叠 */
-			#collectionSubList .item-actions {
-				width: 100%;
-				display: flex;
-				gap: 6px;
-				margin-top: 8px;
-				margin-left: 0;
-			}
-
-			/* 节点集合的删除按钮 */
-			#collectionProxyList .node-delete-btn {
-				position: absolute;
-				right: 12px;
-				top: 28px;
-				/* 与复选框同高 */
-				padding: 6px 10px;
-				font-size: 0.85em;
-			}
-
-			/* 移动端调整节点集合信息区域宽度，为删除按钮留空间 */
-			#collectionProxyList .item-info {
-				width: calc(100% - 120px);
-				/* 再往左20px，为删除按钮留更多空间 */
-				padding-right: 0;
-				/* 移除右内边距 */
-			}
-		}
-
-		.list-item {
-			display: flex;
-			align-items: center;
-			padding: 15px;
-			border: 1px solid #e0e0e0;
-			border-radius: 8px;
-			margin-bottom: 10px;
-			background: #FFFFFF;
-			transition: all 0.2s ease;
-		}
-
-		.list-item:hover {
-			border-color: #6B8E9F;
-			box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
-		}
-
-		.list-item.selected {
-			border-color: #6B8E9F;
-			background: #F5F5F0;
-		}
-
-		.selection-info {
-			padding: 8px 16px;
-			background: #D9E5E9;
-			border-radius: 6px;
-			margin-bottom: 16px;
-			font-size: 14px;
-			color: #6B8E9F;
-			border-left: 4px solid #6B8E9F;
-		}
-
-		.btn:disabled {
-			opacity: 0.5;
-			cursor: not-allowed;
-			background: #bdc3c7 !important;
-		}
-
-		.btn:disabled:hover {
-			transform: none !important;
-			box-shadow: none !important;
-		}
-
-		/* 导入Clash按钮特殊样式 */
-		.btn.clash-import {
-			background: #C4BDCE;
-			color: white;
-		}
-
-		.btn.clash-import:hover {
-			background: #B3AABE;
-		}
-
-		/* 桌面端按钮布局 */
-		@media (min-width: 769px) {
-			.item-actions {
-				display: flex;
-				flex-direction: row;
-				gap: 10px;
-				align-items: center;
-			}
-
-			.item-actions-row-1,
-			.item-actions-row-2 {
-				display: contents;
-			}
-
-			.item-actions .btn {
-				padding: 8px 16px;
-				font-size: 0.9em;
-				white-space: nowrap;
-				margin: 0;
-				min-height: auto;
-			}
-		}
-
-		/* 新节点高亮样式 - 统一使用绿色 */
-		.list-item.newly-added {
-			background: #9CAE9A;
-			border: 2px solid #9CAE9A;
-			box-shadow: 0 4px 8px rgba(39, 174, 96, 0.2);
-			animation: highlightPulse 3s ease-in-out;
-			scroll-margin-top: 20px;
-		}
-
-		@keyframes highlightPulse {
-
-			0%,
-			100% {
-				transform: scale(1);
-			}
-
-			50% {
-				transform: scale(1.02);
-			}
-		}
-
-		/* 输出框样式 */
-		.output-section {
-			margin-top: 20px;
-			border: 1px solid #e0e0e0;
-			border-radius: 8px;
-			overflow: hidden;
-			background: #ffffff;
-		}
-
-		.output-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 12px 16px;
-			background: #F5F5F0;
-			border-bottom: 1px solid #e0e0e0;
-		}
-
-		.output-header label {
-			font-weight: 600;
-			color: #2c3e50;
-			margin: 0;
-			font-size: 14px;
-		}
-
-		.btn.small {
-			padding: 6px 12px;
-			font-size: 12px;
-			min-width: auto;
-		}
-
-		.output-box {
-			height: 80px;
-			overflow-y: auto;
-			padding: 12px;
-			background: #ffffff;
-			font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-			font-size: 13px;
-			line-height: 1.4;
-		}
-
-		.output-placeholder {
-			color: #6c757d;
-			font-style: italic;
-			text-align: center;
-			padding: 40px 0;
-		}
-
-		.output-entry {
-			margin-bottom: 8px;
-			padding: 6px 8px;
-			border-radius: 4px;
-			border-left: 3px solid #6B8E9F;
-			word-wrap: break-word;
-		}
-
-		.output-entry.success {
-			background: #DDE8DD;
-			border-left-color: #9CAE9A;
-			color: #155724;
-		}
-
-		.output-entry.error {
-			background: #E8CFCF;
-			border-left-color: #C59292;
-			color: #5A5A5A;
-		}
-
-		.output-entry.warning {
-			background: #fff3cd;
-			border-left-color: #ffc107;
-			color: #856404;
-		}
-
-		.output-entry.info {
-			background: #D9E5E9;
-			border-left-color: #6B8E9F;
-			color: #0c5460;
-		}
-
-		.output-timestamp {
-			font-size: 11px;
-			color: #6c757d;
-			margin-right: 8px;
-		}
-
-		/* 确认删除弹窗样式 */
-		.confirm-modal {
-			display: none;
-			position: fixed;
-			z-index: 2000;
-			left: 0;
-			top: 0;
-			width: 100%;
-			height: 100%;
-			background-color: rgba(0, 0, 0, 0.6);
-			backdrop-filter: blur(5px);
-		}
-
-		.confirm-modal-content {
-			background: #F5F5F0;
-			margin: 15% auto;
-			padding: 0;
-			border-radius: 16px;
-			width: 90%;
-			max-width: 450px;
-			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-			animation: confirmModalSlideIn 0.3s ease-out;
-			overflow: hidden;
-		}
-
-		@keyframes confirmModalSlideIn {
-			from {
-				opacity: 0;
-				transform: translateY(-50px) scale(0.9);
-			}
-
-			to {
-				opacity: 1;
-				transform: translateY(0) scale(1);
-			}
-		}
-
-		.confirm-modal-header {
-			background: #C59292;
-			color: white;
-			padding: 20px 25px;
-			text-align: center;
-		}
-
-		.confirm-modal-header h3 {
-			margin: 0;
-			font-size: 1.3em;
-			font-weight: 600;
-		}
-
-		.confirm-modal-body {
-			padding: 25px;
-			text-align: center;
-		}
-
-		.confirm-modal-body p {
-			margin: 0 0 20px 0;
-			font-size: 1.1em;
-			color: #2c3e50;
-			line-height: 1.5;
-		}
-
-		.confirm-modal-actions {
-			display: flex;
-			gap: 12px;
-			justify-content: center;
-		}
-
-		.confirm-btn {
-			padding: 12px 24px;
-			border: none;
-			border-radius: 8px;
-			font-size: 1em;
-			font-weight: 600;
-			cursor: pointer;
-			transition: all 0.2s ease;
-			min-width: 100px;
-		}
-
-		.confirm-btn.danger {
-			background: #C59292;
-			color: white;
-		}
-
-		.confirm-btn.danger:hover {
-			background: #B37F7F;
-			transform: translateY(-2px);
-			box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
-		}
-
-		.confirm-btn.secondary {
-			background: #F5F5F0;
-			color: #6c757d;
-			border: 2px solid #e9ecef;
-		}
-
-		.confirm-btn.secondary:hover {
-			background: #e9ecef;
-			color: #495057;
-			transform: translateY(-2px);
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-		}
-
-		/* 弹窗样式 */
-		.modal {
-			display: none;
-			position: fixed;
-			z-index: 1000;
-			left: 0;
-			top: 0;
-			width: 100%;
-			height: 100%;
-			background-color: rgba(0, 0, 0, 0.5);
-		}
-
-		.modal-content {
-			background-color: white;
-			position: fixed;
-			left: 50%;
-			top: 50%;
-			transform: translate(-50%, -50%);
-			padding: 0;
-			border-radius: 12px;
-			width: 90%;
-			max-width: 800px;
-			max-height: 85vh;
-			overflow: hidden;
-			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-		}
-
-		.modal-header {
-			background: #958E9E;
-			color: white;
-			padding: 20px;
-			border-radius: 12px 12px 0 0;
-			position: relative;
-		}
-
-		.modal-header h3 {
-			margin: 0;
-			font-size: 1.5em;
-			display: inline-block;
-		}
-
-		.modal-body {
-			padding: 20px;
-			max-height: calc(85vh - 60px);
-			overflow-y: auto;
-		}
-
-
-		.close {
-			color: white;
-			font-size: 28px;
-			font-weight: bold;
-			cursor: pointer;
-			line-height: 1;
-			position: absolute;
-			right: 20px;
-			top: 50%;
-			transform: translateY(-50%);
-			padding: 5px;
-			min-width: 30px;
-			text-align: center;
-		}
-
-		.close:hover {
-			opacity: 0.7;
-		}
-
-		/* 移动端优化关闭按钮 */
-		@media (max-width: 768px) {
-			.close {
-				font-size: 32px;
-				padding: 8px;
-				min-width: 40px;
-				right: 15px;
-			}
-		}
-
-		/* 订阅元信息样式 */
-		.subscription-meta {
-			margin-top: 8px;
-			padding-top: 8px;
-			border-top: 1px solid #ecf0f1;
-			display: flex;
-			flex-direction: column;
-			gap: 8px;
-		}
-
-		/* 流量信息样式 */
-		.traffic-info {
-			display: flex;
-			align-items: center;
-			gap: 6px;
-			font-size: 0.85em;
-		}
-
-		.traffic-label {
-			color: #7f8c8d;
-			font-weight: 500;
-		}
-
-		.traffic-value {
-			color: #2c3e50;
-			font-weight: 600;
-		}
-
-		/* 到期信息样式 */
-		.expire-info {
-			display: flex;
-			align-items: center;
-			gap: 6px;
-			font-size: 0.85em;
-		}
-
-		.expire-label {
-			font-size: 1.1em;
-		}
-
-		.expire-value {
-			color: #7f8c8d;
-			font-weight: 500;
-		}
-
-		/* 移动端订阅元信息优化 */
-		@media (max-width: 768px) {
-			.subscription-meta {
-				margin-top: 8px;
-				padding-top: 8px;
-				margin-left: 0;
-				border-top: 1px dashed #e0e0e0;
-				display: flex;
-				flex-direction: column;
-				gap: 6px;
-				width: 100%;
-				max-width: 100%;
-				box-sizing: border-box;
-			}
-
-			#collectionSubList .subscription-meta {
-				margin-left: 0;
-				width: 100%;
-				max-width: 100%;
-			}
-
-			.traffic-info,
-			.expire-info {
-				flex: 0 0 auto;
-				width: 100%;
-				max-width: 100%;
-				font-size: 0.75em;
-				background: #F5F5F0;
-				padding: 6px 10px;
-				border-radius: 4px;
-				box-sizing: border-box;
-				overflow: hidden;
-				word-wrap: break-word;
-			}
-
-			/* 移动端订阅项整体布局调整 - 确保不超出容器 */
-			#collectionSubList .subscription-item {
-				overflow: visible;
-			}
-
-			#collectionSubList .subscription-item .item-info {
-				margin-left: 40px;
-				margin-right: 10px;
-				width: calc(100% - 50px);
-				max-width: calc(100% - 50px);
-				box-sizing: border-box;
-			}
-
-			#collectionSubList .item-details {
-				margin-left: 0;
-				width: 100%;
-				max-width: 100%;
-				box-sizing: border-box;
-			}
-		}
-
-		/* 桌面端订阅项布局优化 */
-		@media (min-width: 769px) {
-			.subscription-item .item-info {
-				display: flex;
-				flex-direction: column;
-			}
-
-			.subscription-meta {
-				max-width: 500px;
-				flex-direction: row;
-				gap: 16px;
-			}
-
-			.traffic-info,
-			.expire-info {
-				background: transparent;
-				padding: 0;
-			}
+			transition: background-color .18s ease, border-color .18s ease, color .18s ease;
+		}
+		.btn:hover, .confirm-btn:hover, .btn-icon:hover { background: var(--sage); border-color: var(--pine); }
+		.btn.primary { background: var(--pine); border-color: var(--pine); color: var(--paper); }
+		.btn.primary:hover { background: var(--pine-deep); }
+		.btn.success, .btn.clash-import { background: var(--sage); border-color: var(--control-line); }
+		.btn.success:hover, .btn.clash-import:hover { background: #d8e5d8; border-color: var(--pine); }
+		.btn.danger, .confirm-btn.danger { color: var(--danger); border-color: #b57d76; }
+		.btn.danger:hover, .confirm-btn.danger:hover { background: var(--danger-bg); border-color: var(--danger); }
+		.btn:disabled { opacity: .65; background: #ecece3; color: #47574e; border-color: var(--line); cursor: not-allowed; }
+		.btn[aria-busy='true']::before { content: ''; display: inline-block; width: .8rem; height: .8rem; margin-right: .45rem; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .75s linear infinite; }
+		@keyframes spin { to { transform: rotate(360deg); } }
+		.btn-icon { min-width: 44px; padding: .15rem .45rem; }
+		.btn.small { padding-inline: .65rem; }
+
+		.list { display: grid; gap: .6rem; margin-top: .75rem; }
+		.list-item, .empty-state { padding: clamp(.75rem, 2vw, 1.15rem); border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+		.list-item { display: grid; align-items: center; gap: .65rem; min-width: 0; }
+		.list-item:focus-within, .list-item:hover { border-color: var(--control-line); }
+		.list-item.selected { background: var(--sage); border-color: var(--pine); }
+		.list-item.newly-added { border-inline-start: 4px solid #488164; scroll-margin-block: 1rem; }
+		.item-info, .item-name, .item-details { min-width: 0; overflow-wrap: anywhere; }
+		.item-name { display: flex; align-items: center; flex-wrap: wrap; gap: .35rem; font-weight: 700; }
+		.item-details { margin-top: .2rem; color: var(--muted); font-size: .85rem; }
+		.item-details .success { color: var(--pine); font-weight: 700; }
+		.item-details .btn-icon { margin-inline: .3rem; }
+		.item-link { font-family: var(--font-mono); }
+		.item-actions, .item-actions-row-1, .item-actions-row-2, .action-buttons { display: flex; align-items: center; flex-wrap: wrap; gap: .4rem; }
+		.empty-state { display: grid; justify-items: center; gap: .45rem; padding-block: clamp(2.5rem, 8vw, 5.5rem); border-style: dashed; text-align: center; color: var(--muted); }
+		.empty-state > div { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 10px; background: var(--sage); color: var(--pine); font-size: 1.3rem; }
+		.action-bar { display: grid; gap: .65rem; margin-block: .85rem; }
+		.action-message { min-width: 0; }
+		.message, .selection-info { padding: .6rem .85rem; border: 1px solid var(--line); border-radius: 8px; background: var(--sage); color: var(--pine-deep); font-size: .875rem; white-space: pre-line; overflow-wrap: anywhere; }
+		.message { display: none; margin-bottom: .5rem; }
+		.message.error, .output-entry.error { background: var(--danger-bg); color: var(--danger); }
+		.message.warning, .output-entry.warning { background: #f6e9cc; color: #69461d; }
+		.selection-info { margin-bottom: .5rem; }
+
+		dialog { padding: 0; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); color: var(--ink); box-shadow: 0 20px 70px #102f2640; }
+		dialog::backdrop { background: #102f269c; }
+		.modal { width: min(56rem, calc(100% - 1.5rem)); max-width: none; max-height: calc(100% - 1.5rem); overflow: hidden; }
+		.modal[open] .modal-content { display: flex; flex-direction: column; max-height: min(90dvh, calc(100dvh - 1.5rem)); }
+		.modal-header { display: flex; gap: .75rem; align-items: center; justify-content: space-between; padding: .75rem clamp(.8rem, 3vw, 1.4rem); background: var(--pine-deep); color: var(--paper); }
+		.modal-header h3 { overflow-wrap: anywhere; font-size: clamp(1rem, 3vw, 1.3rem); }
+		.close { min-width: 44px; padding: 0; border-color: #839a8d; background: transparent; color: inherit; font-size: 1.5rem; }
+		.close:hover { background: var(--pine); }
+		.close:focus-visible { outline-color: var(--accent); }
+		.modal-body { overflow-y: auto; overscroll-behavior: contain; padding: clamp(.8rem, 3vw, 1.4rem); }
+		.confirm-modal { width: min(28rem, calc(100% - 1.5rem)); max-width: none; }
+		.confirm-modal-header { padding: 1rem 1.25rem; background: var(--danger-bg); color: var(--danger); }
+		.confirm-modal-body { padding: 1.25rem; overflow-wrap: anywhere; }
+		.confirm-modal-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+
+		.copy-link-single { margin-bottom: 1.1rem; }
+		.link-item { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .85rem; padding: .8rem; background: var(--sage); border-radius: 10px; }
+		.link-item strong { flex-basis: 100%; font-size: .875rem; }
+		.link-url { flex: 1 1 12rem; min-width: 0; color: var(--muted); font: .8rem/1.6 var(--font-mono); overflow-wrap: anywhere; }
+		.input-group { margin-block: .85rem; }
+		.input-group label, .input-group .field-label { display: block; margin-bottom: .35rem; font-size: .875rem; font-weight: 700; }
+		.field-help { margin-top: .25rem; color: var(--muted); font-size: .8rem; }
+		.input-group textarea, .edit-name-input { width: 100%; padding: .6rem .75rem; border: 1px solid var(--control-line); border-radius: 8px; background: var(--paper); }
+		.input-group textarea { display: block; min-height: 6rem; resize: vertical; }
+		.edit-name-input[aria-busy='true'] { opacity: .65; }
+		.custom-select { position: relative; }
+		.select-display { display: flex; width: 100%; justify-content: space-between; font-size: 1rem; font-weight: 500; }
+		.select-arrow { margin-inline-start: .75rem; }
+		.select-display.active .select-arrow { transform: rotate(180deg); }
+		.select-options { display: none; position: absolute; inset: calc(100% + .25rem) 0 auto; z-index: 2; max-height: 13rem; overflow-y: auto; overscroll-behavior: contain; padding: .25rem; border: 1px solid var(--control-line); border-radius: 10px; background: var(--paper); box-shadow: 0 8px 24px #102f2622; }
+		.select-options.show { display: grid; }
+		.select-option { display: flex; align-items: center; gap: .5rem; justify-content: flex-start; min-height: 44px; padding: .45rem .55rem; border: 0; border-radius: 5px; background: none; font-size: .875rem; cursor: pointer; }
+		.select-option:hover, .select-option[aria-pressed='true'] { background: var(--sage); }
+		.select-option:focus-visible { outline-offset: -3px; }
+
+		.output-section { margin-block: .85rem; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+		.output-header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .35rem .75rem; border-bottom: 1px solid var(--line); background: var(--sage); border-radius: 9px 9px 0 0; font-size: .875rem; font-weight: 700; }
+		.output-box { min-height: 4.5rem; max-height: 11rem; overflow-y: auto; padding: .5rem .75rem; font: .8rem/1.55 var(--font-mono); }
+		.output-placeholder, .output-timestamp, .output-time { color: var(--muted); }
+		.output-placeholder { padding-top: .8rem; text-align: center; }
+		.output-entry { padding: .25rem .4rem; border-radius: 4px; white-space: pre-wrap; overflow-wrap: anywhere; }
+		.output-entry.success { color: var(--pine); }
+		.output-timestamp, .output-time { margin-inline-end: .3rem; }
+		.subscription-meta { display: flex; flex-wrap: wrap; gap: .25rem .6rem; margin-top: .4rem; font-size: .8rem; color: var(--muted); }
+		.traffic-info, .expire-info { padding: .15rem .4rem; border-radius: 6px; background: var(--sage); overflow-wrap: anywhere; }
+		.collection-proxy-checkbox, .collection-subscription-checkbox { width: 1.25rem; height: 1.25rem; margin: 0; accent-color: var(--pine); cursor: pointer; }
+		.checkbox-wrapper { display: none; }
+		#collectionProxyList .list-item, #collectionSubList .list-item { grid-template-columns: 1.25rem minmax(0, 1fr); }
+		#collectionProxyList .list-item > .node-delete-btn, #collectionSubList .list-item > .item-actions { grid-column: 2; justify-self: start; }
+
+		@media (min-width: 45rem) {
+			.tabs { width: fit-content; }
+			.tab { min-width: 9rem; padding-inline: 1.4rem; }
+			.list-item { grid-template-columns: minmax(0, 1fr) auto; }
+			.item-actions { justify-content: flex-end; }
+			#collectionProxyList .list-item, #collectionSubList .list-item { grid-template-columns: 1.25rem minmax(0, 1fr) auto; }
+			#collectionProxyList .list-item > .node-delete-btn, #collectionSubList .list-item > .item-actions { grid-column: 3; }
+		}
+		@media (max-width: 34rem) {
+			.header { gap: .75rem; }
+			.brand-mark { flex-basis: 2.8rem; height: 2.8rem; background: repeating-radial-gradient(circle, transparent 0 6px, #759187 7px 8px, transparent 9px 11px); }
+			.brand-mark::after { width: .45rem; height: .45rem; }
+			.item-actions-row-1, .item-actions-row-2 { width: 100%; }
+			.item-actions-row-1 .btn, .item-actions-row-2 .btn { flex: 1 1 5rem; padding-inline: .4rem; }
+		}
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 		}
 	</style>
 </head>
 
 <body>
-	<div class="container">
-		<div class="header">
-			<h1>Clash Sub</h1>
-			<p>轻松管理你的代理节点和订阅链接</p>
-		</div>
+	<main class="container">
+		<header class="header">
+			<div>
+				<h1>Clash Sub</h1>
+				<p>管理代理节点与订阅链接</p>
+			</div>
+			<div class="brand-mark" aria-hidden="true"></div>
+		</header>
 
-		<div class="tabs">
-			<button class="tab active" onclick="switchTab('proxy-collections')">节点集合</button>
-			<button class="tab" onclick="switchTab('sub-collections')">订阅集合</button>
+		<div class="tabs" role="tablist" aria-label="集合类型">
+			<button type="button" class="tab active" id="proxy-tab" role="tab" aria-selected="true"
+				aria-controls="proxy-collections" onclick="switchTab('proxy-collections', event)">节点集合</button>
+			<button type="button" class="tab" id="sub-tab" role="tab" aria-selected="false" tabindex="-1"
+				aria-controls="sub-collections" onclick="switchTab('sub-collections', event)">订阅集合</button>
 		</div>
 
 		<div class="content">
 			<!-- 节点集合管理部分 -->
-			<div id="proxy-collections" class="section active">
-				<h2>节点集合管理</h2>
-				<p>创建和管理多个独立的节点整合订阅链接</p>
-
-				<div class="action-bar">
-					<div class="action-buttons">
-						<button class="btn" onclick="createProxyCollection()">创建新集合</button>
+			<section id="proxy-collections" class="section active" role="tabpanel"
+				aria-labelledby="proxy-tab" tabindex="0">
+				<header class="section-head">
+					<div>
+						<h2>节点集合</h2>
+						<p>将代理节点组合成一个 Clash 订阅链接。</p>
 					</div>
-					<div class="action-message">
-						<div id="collectionMessage" class="message"></div>
-					</div>
+					<button type="button" class="btn primary" onclick="createProxyCollection(event)">创建新集合</button>
+				</header>
+				<div id="collectionMessage" class="message" role="status"></div>
+				<div class="list" id="collectionList" aria-busy="true">
+					<div class="empty-state" role="status"><p>正在加载节点集合…</p></div>
 				</div>
-
-				<div class="list" id="collectionList">
-					<div class="empty-state">
-						<div>📁</div>
-						<p>暂无节点集合，请创建新集合</p>
-					</div>
-				</div>
-			</div>
+			</section>
 
 			<!-- 订阅集合管理部分 -->
-			<div id="sub-collections" class="section">
-				<h2>订阅集合管理</h2>
-				<p>创建和管理多个独立的订阅整合链接</p>
-
-				<div class="action-bar">
-					<div class="action-buttons">
-						<button class="btn" onclick="createSubCollection()">创建新集合</button>
+			<section id="sub-collections" class="section" role="tabpanel"
+				aria-labelledby="sub-tab" tabindex="0" hidden>
+				<header class="section-head">
+					<div>
+						<h2>订阅集合</h2>
+						<p>将多个来源整合成一个 Clash 订阅链接。</p>
 					</div>
-					<div class="action-message">
-						<div id="subCollectionMessage" class="message"></div>
-					</div>
+					<button type="button" class="btn primary" onclick="createSubCollection(event)">创建新集合</button>
+				</header>
+				<div id="subCollectionMessage" class="message" role="status"></div>
+				<div class="list" id="subCollectionList" aria-busy="true">
+					<div class="empty-state" role="status"><p>正在加载订阅集合…</p></div>
 				</div>
-
-				<div class="list" id="subCollectionList">
-					<div class="empty-state">
-						<div>📂</div>
-						<p>暂无订阅集合，请创建新集合</p>
-					</div>
-				</div>
-			</div>
+			</section>
 		</div>
-	</div>
+	</main>
 
 	<!-- 节点集合管理弹窗 -->
-	<div id="proxyCollectionModal" class="modal">
+	<dialog id="proxyCollectionModal" class="modal" aria-labelledby="proxyCollectionModalTitle">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h3 id="proxyCollectionModalTitle">管理节点集合</h3>
-				<span class="close" onclick="closeProxyCollectionModal()">&times;</span>
+				<button type="button" class="close" aria-label="关闭节点管理" onclick="closeProxyCollectionModal()" autofocus>&times;</button>
 			</div>
 			<div class="modal-body">
 				<!-- 复制链接 -->
@@ -1754,80 +299,81 @@
 
 				<!-- 添加节点 -->
 				<div class="input-group">
-					<label for="collectionProxyUrl">添加节点（支持链接和JSON格式，支持批量添加）</label>
-					<textarea id="collectionProxyUrl"
-						placeholder="支持以下格式(每行一个)：&#10;1. 节点链接&#10;2. JSON格式&#10;3. 混合格式：链接和JSON可以混合输入"></textarea>
+					<label for="collectionProxyUrl">添加节点</label>
+					<textarea id="collectionProxyUrl" aria-describedby="collectionProxyUrlHelp" placeholder="粘贴节点链接或 JSON 对象"></textarea>
+					<p class="field-help" id="collectionProxyUrlHelp">每行输入一个节点，可混合使用链接和单行 JSON 对象。</p>
 				</div>
 
 				<div class="input-group">
-					<label for="collectionRegionSelect">地区选择</label>
+					<span id="collectionRegionLabel" class="field-label">地区选择</span>
 					<div class="custom-select" id="collectionRegionSelect">
-						<div class="select-display" onclick="toggleCollectionRegionDropdown()">
+						<button type="button" class="btn select-display" aria-labelledby="collectionRegionLabel selectedCollectionRegion"
+							aria-expanded="false" aria-controls="collectionRegionOptions" onclick="toggleCollectionRegionDropdown()">
 							<span id="selectedCollectionRegion">🌍 自动识别地区</span>
-							<span class="select-arrow">▼</span>
-						</div>
-						<div class="select-options" id="collectionRegionOptions">
-							<div class="select-option" data-value="auto">🌍 自动识别地区</div>
-							<div class="select-option" data-value="US"><span class="fi fi-us"></span> 美国</div>
-							<div class="select-option" data-value="HK"><span class="fi fi-hk"></span> 香港</div>
-							<div class="select-option" data-value="JP"><span class="fi fi-jp"></span> 日本</div>
-							<div class="select-option" data-value="KR"><span class="fi fi-kr"></span> 韩国</div>
-							<div class="select-option" data-value="SG"><span class="fi fi-sg"></span> 新加坡</div>
-							<div class="select-option" data-value="TW"><span class="fi fi-tw"></span> 台湾</div>
-							<div class="select-option" data-value="GB"><span class="fi fi-gb"></span> 英国</div>
-							<div class="select-option" data-value="DE"><span class="fi fi-de"></span> 德国</div>
-							<div class="select-option" data-value="FR"><span class="fi fi-fr"></span> 法国</div>
-							<div class="select-option" data-value="CA"><span class="fi fi-ca"></span> 加拿大</div>
-							<div class="select-option" data-value="AU"><span class="fi fi-au"></span> 澳大利亚</div>
-							<div class="select-option" data-value="RU"><span class="fi fi-ru"></span> 俄罗斯</div>
-							<div class="select-option" data-value="IN"><span class="fi fi-in"></span> 印度</div>
-							<div class="select-option" data-value="BR"><span class="fi fi-br"></span> 巴西</div>
-							<div class="select-option" data-value="TR"><span class="fi fi-tr"></span> 土耳其</div>
-							<div class="select-option" data-value="TH"><span class="fi fi-th"></span> 泰国</div>
-							<div class="select-option" data-value="MY"><span class="fi fi-my"></span> 马来西亚</div>
-							<div class="select-option" data-value="ID"><span class="fi fi-id"></span> 印度尼西亚</div>
-							<div class="select-option" data-value="PH"><span class="fi fi-ph"></span> 菲律宾</div>
-							<div class="select-option" data-value="VN"><span class="fi fi-vn"></span> 越南</div>
-							<div class="select-option" data-value="AR"><span class="fi fi-ar"></span> 阿根廷</div>
-							<div class="select-option" data-value="CL"><span class="fi fi-cl"></span> 智利</div>
-							<div class="select-option" data-value="MX"><span class="fi fi-mx"></span> 墨西哥</div>
-							<div class="select-option" data-value="ZA"><span class="fi fi-za"></span> 南非</div>
-							<div class="select-option" data-value="EG"><span class="fi fi-eg"></span> 埃及</div>
-							<div class="select-option" data-value="AE"><span class="fi fi-ae"></span> 阿联酋</div>
-							<div class="select-option" data-value="IL"><span class="fi fi-il"></span> 以色列</div>
-							<div class="select-option" data-value="NL"><span class="fi fi-nl"></span> 荷兰</div>
-							<div class="select-option" data-value="IT"><span class="fi fi-it"></span> 意大利</div>
-							<div class="select-option" data-value="ES"><span class="fi fi-es"></span> 西班牙</div>
-							<div class="select-option" data-value="SE"><span class="fi fi-se"></span> 瑞典</div>
-							<div class="select-option" data-value="NO"><span class="fi fi-no"></span> 挪威</div>
-							<div class="select-option" data-value="FI"><span class="fi fi-fi"></span> 芬兰</div>
-							<div class="select-option" data-value="DK"><span class="fi fi-dk"></span> 丹麦</div>
-							<div class="select-option" data-value="CH"><span class="fi fi-ch"></span> 瑞士</div>
-							<div class="select-option" data-value="AT"><span class="fi fi-at"></span> 奥地利</div>
-							<div class="select-option" data-value="BE"><span class="fi fi-be"></span> 比利时</div>
-							<div class="select-option" data-value="PL"><span class="fi fi-pl"></span> 波兰</div>
-							<div class="select-option" data-value="CZ"><span class="fi fi-cz"></span> 捷克</div>
-							<div class="select-option" data-value="HU"><span class="fi fi-hu"></span> 匈牙利</div>
-							<div class="select-option" data-value="RO"><span class="fi fi-ro"></span> 罗马尼亚</div>
-							<div class="select-option" data-value="BG"><span class="fi fi-bg"></span> 保加利亚</div>
-							<div class="select-option" data-value="HR"><span class="fi fi-hr"></span> 克罗地亚</div>
-							<div class="select-option" data-value="RS"><span class="fi fi-rs"></span> 塞尔维亚</div>
-							<div class="select-option" data-value="UA"><span class="fi fi-ua"></span> 乌克兰</div>
-							<div class="select-option" data-value="GR"><span class="fi fi-gr"></span> 希腊</div>
-							<div class="select-option" data-value="PT"><span class="fi fi-pt"></span> 葡萄牙</div>
-							<div class="select-option" data-value="IE"><span class="fi fi-ie"></span> 爱尔兰</div>
-							<div class="select-option" data-value="LU"><span class="fi fi-lu"></span> 卢森堡</div>
-							<div class="select-option" data-value="IS"><span class="fi fi-is"></span> 冰岛</div>
-							<div class="select-option" data-value="NZ"><span class="fi fi-nz"></span> 新西兰</div>
-							<div class="select-option" data-value="CO"><span class="fi fi-co"></span> 哥伦比亚</div>
-							<div class="select-option" data-value="PE"><span class="fi fi-pe"></span> 秘鲁</div>
+							<span class="select-arrow" aria-hidden="true">▾</span>
+						</button>
+						<div class="select-options" id="collectionRegionOptions" role="group" aria-labelledby="collectionRegionLabel">
+							<button type="button" class="select-option" data-value="auto" aria-pressed="true">🌍 自动识别地区</button>
+							<button type="button" class="select-option" data-value="US" aria-pressed="false"><span aria-hidden="true" class="fi fi-us"></span> 美国</button>
+							<button type="button" class="select-option" data-value="HK" aria-pressed="false"><span aria-hidden="true" class="fi fi-hk"></span> 香港</button>
+							<button type="button" class="select-option" data-value="JP" aria-pressed="false"><span aria-hidden="true" class="fi fi-jp"></span> 日本</button>
+							<button type="button" class="select-option" data-value="KR" aria-pressed="false"><span aria-hidden="true" class="fi fi-kr"></span> 韩国</button>
+							<button type="button" class="select-option" data-value="SG" aria-pressed="false"><span aria-hidden="true" class="fi fi-sg"></span> 新加坡</button>
+							<button type="button" class="select-option" data-value="TW" aria-pressed="false"><span aria-hidden="true" class="fi fi-tw"></span> 台湾</button>
+							<button type="button" class="select-option" data-value="GB" aria-pressed="false"><span aria-hidden="true" class="fi fi-gb"></span> 英国</button>
+							<button type="button" class="select-option" data-value="DE" aria-pressed="false"><span aria-hidden="true" class="fi fi-de"></span> 德国</button>
+							<button type="button" class="select-option" data-value="FR" aria-pressed="false"><span aria-hidden="true" class="fi fi-fr"></span> 法国</button>
+							<button type="button" class="select-option" data-value="CA" aria-pressed="false"><span aria-hidden="true" class="fi fi-ca"></span> 加拿大</button>
+							<button type="button" class="select-option" data-value="AU" aria-pressed="false"><span aria-hidden="true" class="fi fi-au"></span> 澳大利亚</button>
+							<button type="button" class="select-option" data-value="RU" aria-pressed="false"><span aria-hidden="true" class="fi fi-ru"></span> 俄罗斯</button>
+							<button type="button" class="select-option" data-value="IN" aria-pressed="false"><span aria-hidden="true" class="fi fi-in"></span> 印度</button>
+							<button type="button" class="select-option" data-value="BR" aria-pressed="false"><span aria-hidden="true" class="fi fi-br"></span> 巴西</button>
+							<button type="button" class="select-option" data-value="TR" aria-pressed="false"><span aria-hidden="true" class="fi fi-tr"></span> 土耳其</button>
+							<button type="button" class="select-option" data-value="TH" aria-pressed="false"><span aria-hidden="true" class="fi fi-th"></span> 泰国</button>
+							<button type="button" class="select-option" data-value="MY" aria-pressed="false"><span aria-hidden="true" class="fi fi-my"></span> 马来西亚</button>
+							<button type="button" class="select-option" data-value="ID" aria-pressed="false"><span aria-hidden="true" class="fi fi-id"></span> 印度尼西亚</button>
+							<button type="button" class="select-option" data-value="PH" aria-pressed="false"><span aria-hidden="true" class="fi fi-ph"></span> 菲律宾</button>
+							<button type="button" class="select-option" data-value="VN" aria-pressed="false"><span aria-hidden="true" class="fi fi-vn"></span> 越南</button>
+							<button type="button" class="select-option" data-value="AR" aria-pressed="false"><span aria-hidden="true" class="fi fi-ar"></span> 阿根廷</button>
+							<button type="button" class="select-option" data-value="CL" aria-pressed="false"><span aria-hidden="true" class="fi fi-cl"></span> 智利</button>
+							<button type="button" class="select-option" data-value="MX" aria-pressed="false"><span aria-hidden="true" class="fi fi-mx"></span> 墨西哥</button>
+							<button type="button" class="select-option" data-value="ZA" aria-pressed="false"><span aria-hidden="true" class="fi fi-za"></span> 南非</button>
+							<button type="button" class="select-option" data-value="EG" aria-pressed="false"><span aria-hidden="true" class="fi fi-eg"></span> 埃及</button>
+							<button type="button" class="select-option" data-value="AE" aria-pressed="false"><span aria-hidden="true" class="fi fi-ae"></span> 阿联酋</button>
+							<button type="button" class="select-option" data-value="IL" aria-pressed="false"><span aria-hidden="true" class="fi fi-il"></span> 以色列</button>
+							<button type="button" class="select-option" data-value="NL" aria-pressed="false"><span aria-hidden="true" class="fi fi-nl"></span> 荷兰</button>
+							<button type="button" class="select-option" data-value="IT" aria-pressed="false"><span aria-hidden="true" class="fi fi-it"></span> 意大利</button>
+							<button type="button" class="select-option" data-value="ES" aria-pressed="false"><span aria-hidden="true" class="fi fi-es"></span> 西班牙</button>
+							<button type="button" class="select-option" data-value="SE" aria-pressed="false"><span aria-hidden="true" class="fi fi-se"></span> 瑞典</button>
+							<button type="button" class="select-option" data-value="NO" aria-pressed="false"><span aria-hidden="true" class="fi fi-no"></span> 挪威</button>
+							<button type="button" class="select-option" data-value="FI" aria-pressed="false"><span aria-hidden="true" class="fi fi-fi"></span> 芬兰</button>
+							<button type="button" class="select-option" data-value="DK" aria-pressed="false"><span aria-hidden="true" class="fi fi-dk"></span> 丹麦</button>
+							<button type="button" class="select-option" data-value="CH" aria-pressed="false"><span aria-hidden="true" class="fi fi-ch"></span> 瑞士</button>
+							<button type="button" class="select-option" data-value="AT" aria-pressed="false"><span aria-hidden="true" class="fi fi-at"></span> 奥地利</button>
+							<button type="button" class="select-option" data-value="BE" aria-pressed="false"><span aria-hidden="true" class="fi fi-be"></span> 比利时</button>
+							<button type="button" class="select-option" data-value="PL" aria-pressed="false"><span aria-hidden="true" class="fi fi-pl"></span> 波兰</button>
+							<button type="button" class="select-option" data-value="CZ" aria-pressed="false"><span aria-hidden="true" class="fi fi-cz"></span> 捷克</button>
+							<button type="button" class="select-option" data-value="HU" aria-pressed="false"><span aria-hidden="true" class="fi fi-hu"></span> 匈牙利</button>
+							<button type="button" class="select-option" data-value="RO" aria-pressed="false"><span aria-hidden="true" class="fi fi-ro"></span> 罗马尼亚</button>
+							<button type="button" class="select-option" data-value="BG" aria-pressed="false"><span aria-hidden="true" class="fi fi-bg"></span> 保加利亚</button>
+							<button type="button" class="select-option" data-value="HR" aria-pressed="false"><span aria-hidden="true" class="fi fi-hr"></span> 克罗地亚</button>
+							<button type="button" class="select-option" data-value="RS" aria-pressed="false"><span aria-hidden="true" class="fi fi-rs"></span> 塞尔维亚</button>
+							<button type="button" class="select-option" data-value="UA" aria-pressed="false"><span aria-hidden="true" class="fi fi-ua"></span> 乌克兰</button>
+							<button type="button" class="select-option" data-value="GR" aria-pressed="false"><span aria-hidden="true" class="fi fi-gr"></span> 希腊</button>
+							<button type="button" class="select-option" data-value="PT" aria-pressed="false"><span aria-hidden="true" class="fi fi-pt"></span> 葡萄牙</button>
+							<button type="button" class="select-option" data-value="IE" aria-pressed="false"><span aria-hidden="true" class="fi fi-ie"></span> 爱尔兰</button>
+							<button type="button" class="select-option" data-value="LU" aria-pressed="false"><span aria-hidden="true" class="fi fi-lu"></span> 卢森堡</button>
+							<button type="button" class="select-option" data-value="IS" aria-pressed="false"><span aria-hidden="true" class="fi fi-is"></span> 冰岛</button>
+							<button type="button" class="select-option" data-value="NZ" aria-pressed="false"><span aria-hidden="true" class="fi fi-nz"></span> 新西兰</button>
+							<button type="button" class="select-option" data-value="CO" aria-pressed="false"><span aria-hidden="true" class="fi fi-co"></span> 哥伦比亚</button>
+							<button type="button" class="select-option" data-value="PE" aria-pressed="false"><span aria-hidden="true" class="fi fi-pe"></span> 秘鲁</button>
 						</div>
 					</div>
 				</div>
 
 				<div class="action-bar">
 					<div class="action-buttons">
-						<button class="btn" onclick="addProxyToCurrentCollection()">添加节点</button>
+						<button type="button" class="btn primary" id="addCollectionProxyBtn" onclick="addProxyToCurrentCollection()">添加节点</button>
 						<button class="btn" onclick="selectAllCollectionProxies()"
 							id="selectAllCollectionProxiesBtn">全选</button>
 						<button class="btn" onclick="copySelectedCollectionProxies()"
@@ -1836,18 +382,18 @@
 							id="deleteSelectedCollectionProxiesBtn" disabled>删除选中</button>
 					</div>
 					<div class="action-message">
-						<div id="collectionProxySelectionInfo" class="selection-info" style="display: none;"></div>
-						<div id="collectionProxyMessage" class="message"></div>
+						<div id="collectionProxySelectionInfo" class="selection-info" role="status" style="display: none;"></div>
+						<div id="collectionProxyMessage" class="message" role="status"></div>
 					</div>
 				</div>
 
 				<!-- 节点管理输出框 -->
 				<div class="output-section">
 					<div class="output-header">
-						<label>操作日志</label>
+						<span>操作日志</span>
 						<button class="btn small" onclick="clearCollectionOutput()">清空日志</button>
 					</div>
-					<div class="output-box" id="collectionOutputBox">
+					<div class="output-box" id="collectionOutputBox" role="log" aria-label="操作日志" tabindex="0">
 						<div class="output-placeholder">暂无操作记录</div>
 					</div>
 				</div>
@@ -1861,14 +407,14 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</dialog>
 
 	<!-- 订阅集合管理弹窗 -->
-	<div id="subCollectionModal" class="modal">
+	<dialog id="subCollectionModal" class="modal" aria-labelledby="subCollectionModalTitle">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h3 id="subCollectionModalTitle">管理订阅集合</h3>
-				<span class="close" onclick="closeSubCollectionModal()">&times;</span>
+				<button type="button" class="close" aria-label="关闭订阅管理" onclick="closeSubCollectionModal()" autofocus>&times;</button>
 			</div>
 			<div class="modal-body">
 				<!-- 复制链接 -->
@@ -1882,13 +428,14 @@
 
 				<!-- 添加订阅 -->
 				<div class="input-group">
-					<label for="collectionSubUrl">添加订阅链接（支持批量添加，每行一个链接）</label>
-					<textarea id="collectionSubUrl" placeholder="请输入订阅链接，每行一个链接"></textarea>
+					<label for="collectionSubUrl">添加订阅链接</label>
+					<textarea id="collectionSubUrl" aria-describedby="collectionSubUrlHelp" placeholder="https://…"></textarea>
+					<p class="field-help" id="collectionSubUrlHelp">每行输入一个订阅链接。</p>
 				</div>
 
 				<div class="action-bar">
 					<div class="action-buttons">
-						<button class="btn" onclick="addSubscriptionToCurrentCollection()">添加订阅</button>
+						<button type="button" class="btn primary" id="addCollectionSubBtn" onclick="addSubscriptionToCurrentCollection()">添加订阅</button>
 						<button class="btn" onclick="activeDetectionForCurrentCollection()"
 							id="currentCollectionActiveDetectionBtn">活跃检测</button>
 						<button class="btn" onclick="selectAllCollectionSubscriptions()"
@@ -1903,18 +450,18 @@
 				<!-- 订阅管理输出框 -->
 				<div class="output-section">
 					<div class="output-header">
-						<label>操作日志</label>
+						<span>操作日志</span>
 						<button class="btn small" onclick="clearCollectionSubOutput()">清空日志</button>
 					</div>
-					<div class="output-box" id="collectionSubOutputBox">
+					<div class="output-box" id="collectionSubOutputBox" role="log" aria-label="操作日志" tabindex="0">
 						<div class="output-placeholder">暂无操作记录</div>
 					</div>
 				</div>
 
 				<div class="action-message">
-					<div id="collectionSubscriptionSelectionInfo" class="selection-info" style="display: none;">
+					<div id="collectionSubscriptionSelectionInfo" class="selection-info" role="status" style="display: none;">
 					</div>
-					<div id="collectionSubMessage" class="message"></div>
+					<div id="collectionSubMessage" class="message" role="status"></div>
 				</div>
 
 				<!-- 订阅列表 -->
@@ -1926,8 +473,23 @@
 				</div>
 			</div>
 		</div>
-	</div>
-	</div>
+	</dialog>
+
+	<!-- 确认删除弹窗 -->
+	<dialog id="confirmModal" class="confirm-modal" role="alertdialog" aria-labelledby="confirmHeading" aria-describedby="confirmMessage">
+		<div class="confirm-modal-content">
+			<div class="confirm-modal-header">
+				<h3 id="confirmHeading">确认删除</h3>
+			</div>
+			<div class="confirm-modal-body">
+				<p id="confirmMessage">确定要删除选中的项目吗？</p>
+				<div class="confirm-modal-actions">
+					<button type="button" class="confirm-btn secondary" autofocus onclick="hideConfirmModal()">取消</button>
+					<button type="button" class="confirm-btn danger" id="confirmDeleteBtn" onclick="confirmDelete()">删除</button>
+				</div>
+			</div>
+		</div>
+	</dialog>
 
 	<script>
 		let proxyCollections = []; // 节点集合
@@ -1940,63 +502,94 @@
 		let currentManagingSubCollection = null;
 		let selectedCollectionRegionValue = 'auto';
 
-		// 页面加载时初始化
-		window.addEventListener('load', function () {
-			// 设置订阅链接
-			const origin = window.location.origin;
-
-			// 设置顶部复制链接
-
-			loadProxyCollections();
-			loadSubCollections();
-			// 启动订阅名称定时更新（每小时）
-
-			// 添加集合地区选择事件监听器
-			setupCollectionRegionSelector();
-		});
+		// 脚本位于页面控件之后，可以立即绑定监听器并加载列表。
+		setupCollectionRegionSelector();
+		loadProxyCollections();
+		loadSubCollections();
 
 		// 切换标签页
-		function switchTab(tab) {
-			document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-			document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+		function switchTab(tab, event) {
+			const getTarget = button => button?.getAttribute('aria-controls');
+			const activeTab = getTarget(event?.currentTarget) === tab
+				? event.currentTarget
+				: Array.from(document.querySelectorAll('.tab')).find(button => getTarget(button) === tab);
+			const activePanel = document.getElementById(tab);
+			if (!activeTab || !activePanel) return;
 
-			event.target.classList.add('active');
-			document.getElementById(tab).classList.add('active');
+			document.querySelectorAll('.tab').forEach(button => {
+				const active = button === activeTab;
+				button.classList.toggle('active', active);
+				button.setAttribute('aria-selected', String(active));
+				button.tabIndex = active ? 0 : -1;
+			});
+			document.querySelectorAll('.section').forEach(panel => {
+				const active = panel === activePanel;
+				panel.classList.toggle('active', active);
+				panel.hidden = !active;
+			});
+		}
+
+		document.querySelector('.tabs').addEventListener('keydown', function (event) {
+			const tabs = Array.from(this.querySelectorAll('.tab'));
+			const index = tabs.indexOf(event.target);
+			if (index < 0) return;
+			let next;
+			switch (event.key) {
+				case 'ArrowLeft': next = tabs[(index - 1 + tabs.length) % tabs.length]; break;
+				case 'ArrowRight': next = tabs[(index + 1) % tabs.length]; break;
+				case 'Home': next = tabs[0]; break;
+				case 'End': next = tabs[tabs.length - 1]; break;
+				default: return;
+			}
+			event.preventDefault();
+			next.click();
+			next.focus();
+		});
+
+		// 仅用于 HTML 文本节点。动作参数通过监听器传递，不进入 HTML。
+		function escapeHtmlText(value) {
+			return String(value ?? '').replace(/[&<>]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[char]));
+		}
+
+		function setButtonBusy(button, busy, label) {
+			if (!button) return;
+			button.disabled = busy;
+			button.textContent = label;
+			button.setAttribute('aria-busy', String(busy));
 		}
 
 		// 复制文本到剪贴板
-		function copyToClipboard(text) {
+		async function copyToClipboard(text) {
 			if (navigator.clipboard) {
-				navigator.clipboard.writeText(text).then(() => {
-					// 复制成功
-				}).catch(err => {
-					// 降级方案
-					fallbackCopyTextToClipboard(text);
-				});
-			} else {
-				// 降级方案
-				fallbackCopyTextToClipboard(text);
+				try {
+					await navigator.clipboard.writeText(text);
+					return true;
+				} catch (error) {
+					// 浏览器拒绝 Clipboard API 时使用文本选区。
+				}
 			}
+			return fallbackCopyTextToClipboard(text);
 		}
 
-		// 降级复制方案
 		function fallbackCopyTextToClipboard(text) {
 			const textArea = document.createElement('textarea');
 			textArea.value = text;
+			textArea.readOnly = true;
 			textArea.style.position = 'fixed';
-			textArea.style.left = '-999999px';
-			textArea.style.top = '-999999px';
-			document.body.appendChild(textArea);
-			textArea.focus();
+			textArea.style.opacity = '0';
+			const previousFocus = document.activeElement;
+			const openDialogs = document.querySelectorAll('dialog[open]');
+			(openDialogs[openDialogs.length - 1] || document.body).appendChild(textArea);
+			textArea.focus({ preventScroll: true });
 			textArea.select();
-
 			try {
-				document.execCommand('copy');
-			} catch (err) {
-				console.error('复制失败:', err);
+				return document.execCommand('copy');
+			} catch (error) {
+				return false;
+			} finally {
+				textArea.remove();
+				previousFocus?.focus({ preventScroll: true });
 			}
-
-			document.body.removeChild(textArea);
 		}
 
 		// 显示消息
@@ -2025,12 +618,22 @@
 
 		// 加载节点集合列表
 		async function loadProxyCollections() {
+			const list = document.getElementById('collectionList');
+			list.setAttribute('aria-busy', 'true');
 			try {
 				const response = await fetch('/api/proxy-collections');
-				proxyCollections = await response.json();
+				if (!response.ok) throw new Error('HTTP ' + response.status);
+				const collections = await response.json();
+				if (!Array.isArray(collections)) throw new Error('集合响应格式无效');
+				proxyCollections = collections;
 				renderProxyCollections();
 			} catch (error) {
 				console.error('加载节点集合失败:', error);
+				showMessage('collectionMessage', '加载节点集合失败，请稍后刷新页面重试', 'error');
+				const loading = list.querySelector('.empty-state[role="status"]');
+				if (loading) loading.textContent = '加载节点集合失败';
+			} finally {
+				list.setAttribute('aria-busy', 'false');
 			}
 		}
 
@@ -2052,30 +655,38 @@
 
 				html += '<div class="list-item" data-index="' + i + '">';
 				html += '<div class="item-info">';
-				html += '<div class="item-name">' + collection.name + '</div>';
-				html += '<div class="item-details">节点数量: ' + proxyCount + ' | 订阅链接: ' + collectionUrl + '</div>';
+				html += '<div class="item-name">' + escapeHtmlText(collection.name) + '</div>';
+				html += '<div class="item-details">节点数量: ' + proxyCount + '</div><div class="item-details item-link">订阅链接: ' + escapeHtmlText(collectionUrl) + '</div>';
 				html += '</div>';
 				html += '<div class="item-actions">';
 				html += '<div class="item-actions-row-1">';
-				html += '<button class="btn clash-import" onclick="importToClash(\'' + collection.id + '\')">导入Clash</button>';
-				html += '<button class="btn" onclick="copyCollectionLink(\'' + collection.id + '\')">复制链接</button>';
+				html += '<button class="btn clash-import" data-action="importToClash">导入Clash</button>';
+				html += '<button class="btn" data-action="copyCollectionLink">复制链接</button>';
 				html += '</div>';
 				html += '<div class="item-actions-row-2">';
-				html += '<button class="btn" onclick="manageCollection(\'' + collection.id + '\')">管理节点</button>';
-				html += '<button class="btn" onclick="renameCollection(\'' + collection.id + '\')">重命名</button>';
-				html += '<button class="btn danger" onclick="deleteCollection(\'' + collection.id + '\')">删除</button>';
+				html += '<button class="btn" data-action="manageCollection">管理节点</button>';
+				html += '<button class="btn" data-action="renameCollection">重命名</button>';
+				html += '<button class="btn danger" data-action="deleteCollection">删除</button>';
 				html += '</div>';
 				html += '</div>';
 				html += '</div>';
 			}
 			listEl.innerHTML = html;
+			const actions = { importToClash, copyCollectionLink, manageCollection, renameCollection, deleteCollection };
+			listEl.querySelectorAll('[data-action]').forEach(button => {
+				const collection = proxyCollections[Number(button.closest('[data-index]').dataset.index)];
+				button.addEventListener('click', event => actions[button.dataset.action](collection.id, event));
+			});
 		}
 
 		// 创建新的节点集合
-		async function createProxyCollection() {
+		async function createProxyCollection(event) {
+			const button = event?.currentTarget;
+			if (button?.disabled) return;
 			const name = prompt('请输入集合名称（留空使用默认名称）:');
 			if (name === null) return; // 用户取消
 
+			setButtonBusy(button, true, '创建中…');
 			try {
 				const response = await fetch('/api/proxy-collections', {
 					method: 'POST',
@@ -2093,6 +704,8 @@
 				}
 			} catch (error) {
 				showMessage('collectionMessage', '创建节点集合失败', 'error');
+			} finally {
+				setButtonBusy(button, false, '创建新集合');
 			}
 		}
 
@@ -2114,11 +727,13 @@
 		}
 
 		// 复制集合订阅链接
-		function copyCollectionLink(collectionId) {
+		async function copyCollectionLink(collectionId) {
 			const origin = window.location.origin;
 			const url = `${origin}/clash/proxies/${collectionId}`;
-			copyToClipboard(url);
-			showMessage('collectionMessage', '订阅链接已复制到剪贴板');
+			const copied = await copyToClipboard(url);
+			const message = copied ? '订阅链接已复制到剪贴板' : '复制失败，请检查浏览器剪贴板权限';
+			const type = copied ? 'success' : 'error';
+			showMessage('collectionMessage', message, type);
 		}
 
 		// 重命名集合
@@ -2197,12 +812,12 @@
 			renderCollectionProxies();
 
 			// 显示弹窗
-			document.getElementById('proxyCollectionModal').style.display = 'block';
+			document.getElementById('proxyCollectionModal').showModal();
 		}
 
 		// 关闭节点集合管理弹窗
 		function closeProxyCollectionModal() {
-			document.getElementById('proxyCollectionModal').style.display = 'none';
+			document.getElementById('proxyCollectionModal').close();
 			currentManagingCollection = null;
 		}
 
@@ -2234,20 +849,20 @@
 
 				html += '<div class="list-item' + highlightClass + '" data-index="' + i + '">';
 				// 桌面端复选框
-				html += '<input type="checkbox" class="collection-proxy-checkbox desktop-checkbox" data-index="' + i + '" onchange="syncCheckboxState(' + i + ', \'proxy\')">';
+				html += '<input type="checkbox" aria-label="选择第 ' + (i + 1) + ' 个节点" class="collection-proxy-checkbox desktop-checkbox" data-index="' + i + '" onchange="syncCheckboxState(' + i + ', \'proxy\', event)">';
 				// 移动端复选框容器
 				html += '<div class="checkbox-wrapper">';
-				html += '<input type="checkbox" class="collection-proxy-checkbox mobile-checkbox" data-index="' + i + '" onchange="syncCheckboxState(' + i + ', \'proxy\')">';
+				html += '<input type="checkbox" aria-label="选择第 ' + (i + 1) + ' 个节点" class="collection-proxy-checkbox mobile-checkbox" data-index="' + i + '" onchange="syncCheckboxState(' + i + ', \'proxy\', event)">';
 				html += '</div>';
 				html += '<div class="item-info">';
 				html += '<div class="item-name">';
-				html += '<span class="name-text">' + proxy.name + '</span>';
-				html += '<button class="btn-icon" onclick="renameCollectionProxy(' + i + ')" title="重命名">✏️</button>';
+				html += '<span class="name-text">' + escapeHtmlText(proxy.name) + '</span>';
+				html += '<button class="btn-icon" onclick="renameCollectionProxy(' + i + ')" aria-label="重命名节点" title="重命名">✏️</button>';
 				html += '</div>';
-				html += '<div class="item-details">' + proxy.type + ' | ';
-				html += '<span class="server-text">' + proxy.server + '</span>';
-				html += '<button class="btn-icon" onclick="changeProxyServer(' + i + ')" title="修改IP">🔧</button>';
-				html += ':' + proxy.port + '</div>';
+				html += '<div class="item-details">' + escapeHtmlText(proxy.type) + ' | ';
+				html += '<span class="server-text">' + escapeHtmlText(proxy.server) + '</span>';
+				html += '<button class="btn-icon" onclick="changeProxyServer(' + i + ')" aria-label="修改服务器地址" title="修改服务器地址">🔧</button>';
+				html += ':' + escapeHtmlText(proxy.port) + '</div>';
 				html += '</div>';
 				// 删除按钮
 				html += '<button class="btn danger node-delete-btn" onclick="deleteSingleCollectionProxy(' + i + ')">删除</button>';
@@ -2261,7 +876,7 @@
 				setTimeout(() => {
 					const listItems = document.querySelectorAll('#collectionProxyList .list-item');
 					if (listItems[firstNewlyAddedIndex]) {
-						listItems[firstNewlyAddedIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+						listItems[firstNewlyAddedIndex].scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
 					}
 				}, 100);
 			}
@@ -2290,10 +905,13 @@
 			const timestamp = new Date().toLocaleTimeString();
 			const entry = document.createElement('div');
 			entry.className = `output-entry ${type}`;
-			entry.innerHTML = `
-				<span class="output-timestamp">[${timestamp}]</span>
-				<span class="output-message">${message}</span>
-			`;
+			const time = document.createElement('span');
+			time.className = 'output-timestamp';
+			time.textContent = '[' + timestamp + ']';
+			const content = document.createElement('span');
+			content.className = 'output-message';
+			content.textContent = message;
+			entry.append(time, content);
 
 			outputBox.appendChild(entry);
 			outputBox.scrollTop = outputBox.scrollHeight;
@@ -2386,7 +1004,7 @@
 		}
 
 		// 复制选中集合节点的JSON
-		function copySelectedCollectionProxies() {
+		async function copySelectedCollectionProxies() {
 			const selectedIndexes = getSelectedCollectionProxyIndexes();
 			if (selectedIndexes.length === 0) {
 				showCollectionMessage('请先选择要复制的节点', 'warning');
@@ -2397,22 +1015,14 @@
 			// 修改为单行格式，每个节点一行，取消最外层的[]
 			const jsonData = selectedProxies.map(proxy => JSON.stringify(proxy)).join('\n');
 
-			navigator.clipboard.writeText(jsonData).then(() => {
-				showCollectionMessage(`已复制 ${selectedIndexes.length} 个节点的JSON数据`, 'success');
-			}).catch(() => {
-				// 降级方案
-				const textArea = document.createElement('textarea');
-				textArea.value = jsonData;
-				document.body.appendChild(textArea);
-				textArea.select();
-				document.execCommand('copy');
-				document.body.removeChild(textArea);
-				showCollectionMessage(`已复制 ${selectedIndexes.length} 个节点的JSON数据`, 'success');
-			});
+			const copied = await copyToClipboard(jsonData);
+			showCollectionMessage(copied ? `已复制 ${selectedIndexes.length} 个节点的JSON数据` : '复制失败，请检查浏览器剪贴板权限', copied ? 'success' : 'error');
 		}
 
 		// 删除选中的集合节点
 		async function deleteSelectedCollectionProxies() {
+			const collectionId = currentManagingCollection?.id;
+			if (collectionId == null) return;
 			const selectedIndexes = getSelectedCollectionProxyIndexes();
 			if (selectedIndexes.length === 0) {
 				showCollectionMessage('请先选择要删除的节点', 'warning');
@@ -2426,7 +1036,7 @@
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({
 							action: 'batchDeleteProxy',
-							collectionId: currentManagingCollection.id,
+							collectionId,
 							indexes: selectedIndexes
 						})
 					});
@@ -2437,8 +1047,10 @@
 
 						// 重新加载集合数据并渲染
 						await loadProxyCollections();
-						currentManagingCollection = proxyCollections.find(c => c.id === currentManagingCollection.id);
-						renderCollectionProxies();
+						if (currentManagingCollection?.id === collectionId) {
+							currentManagingCollection = proxyCollections.find(c => c.id === collectionId) || currentManagingCollection;
+							renderCollectionProxies();
+						}
 					} else {
 						showCollectionMessage(result.error || '删除失败', 'error');
 					}
@@ -2449,13 +1061,15 @@
 		}
 
 		// 复制当前集合链接
-		function copyCurrentCollectionLink() {
+		async function copyCurrentCollectionLink() {
 			if (!currentManagingCollection) return;
 			const origin = window.location.origin;
 			const url = `${origin}/clash/proxies/${currentManagingCollection.id}`;
-			copyToClipboard(url);
-			showCollectionMessage('订阅链接已复制到剪贴板', 'success');
-			addCollectionOutput(`已复制集合订阅链接: ${url}`, 'info');
+			const copied = await copyToClipboard(url);
+			const message = copied ? '订阅链接已复制到剪贴板' : '复制失败，请检查浏览器剪贴板权限';
+			const type = copied ? 'success' : 'error';
+			showCollectionMessage(message, type);
+			if (copied) addCollectionOutput(`已复制集合订阅链接: ${url}`, 'info');
 		}
 
 		// 显示集合管理消息
@@ -2483,23 +1097,41 @@
 
 		// 切换集合地区下拉菜单
 		function toggleCollectionRegionDropdown() {
-			const display = document.querySelector('#collectionRegionSelect .select-display');
-			const options = document.getElementById('collectionRegionOptions');
-
-			display.classList.toggle('active');
-			options.classList.toggle('show');
+			const trigger = document.querySelector('#collectionRegionSelect .select-display');
+			const open = trigger.getAttribute('aria-expanded') !== 'true';
+			setCollectionRegionDropdownOpen(open);
+			if (open) document.querySelector('#collectionRegionOptions [aria-pressed="true"]')?.focus();
 		}
 
 		// 选择集合地区选项
 		function selectCollectionRegionOption(value, text) {
 			selectedCollectionRegionValue = value;
-			document.getElementById('selectedCollectionRegion').innerHTML = text;
-			document.getElementById('collectionRegionOptions').classList.remove('show');
-			document.querySelector('#collectionRegionSelect .select-display').classList.remove('active');
+			const selected = document.getElementById('selectedCollectionRegion');
+			const options = document.querySelectorAll('#collectionRegionOptions .select-option');
+			const option = Array.from(options).find(item => item.dataset.value === value);
+			if (option) {
+				selected.replaceChildren(...Array.from(option.childNodes, node => node.cloneNode(true)));
+			} else {
+				selected.textContent = text ?? '';
+			}
+			options.forEach(item => item.setAttribute('aria-pressed', String(item === option)));
+			setCollectionRegionDropdownOpen(false);
+			document.querySelector('#collectionRegionSelect .select-display').focus();
+		}
+
+		function setCollectionRegionDropdownOpen(open) {
+			const display = document.querySelector('#collectionRegionSelect .select-display');
+			display.setAttribute('aria-expanded', String(open));
+			display.classList.toggle('active', open);
+			document.getElementById('collectionRegionOptions').classList.toggle('show', open);
 		}
 
 		// 向当前集合添加节点（支持链接和JSON格式自动识别）
 		async function addProxyToCurrentCollection() {
+			const collectionId = currentManagingCollection?.id;
+			if (collectionId == null) return;
+			const button = document.getElementById('addCollectionProxyBtn');
+			if (button?.disabled) return;
 			if (!currentManagingCollection) return;
 
 			const inputContent = document.getElementById('collectionProxyUrl').value.trim();
@@ -2508,6 +1140,7 @@
 				return;
 			}
 
+			setButtonBusy(button, true, '添加中…');
 			try {
 				// 尝试解析输入内容，自动识别格式
 				const parsedData = parseCollectionProxyInput(inputContent, selectedCollectionRegionValue);
@@ -2545,7 +1178,7 @@
 					showCollectionMessage(message);
 
 					// 清空输入框
-					document.getElementById('collectionProxyUrl').value = '';
+					if (currentManagingCollection?.id === collectionId) document.getElementById('collectionProxyUrl').value = '';
 
 					// 清空之前的高亮记录并记录新添加的节点
 					newlyAddedCollectionProxies.clear();
@@ -2557,8 +1190,10 @@
 
 					// 重新加载集合数据并渲染
 					await loadProxyCollections();
-					currentManagingCollection = proxyCollections.find(c => c.id === currentManagingCollection.id);
-					renderCollectionProxies();
+					if (currentManagingCollection?.id === collectionId) {
+						currentManagingCollection = proxyCollections.find(c => c.id === collectionId) || currentManagingCollection;
+						renderCollectionProxies();
+					}
 
 					// 显示添加成功的信息
 					if (newlyAddedCollectionProxies.size > 0) {
@@ -2567,6 +1202,8 @@
 				}
 			} catch (error) {
 				showCollectionMessage(error.message || '添加节点失败', 'error');
+			} finally {
+				setButtonBusy(button, false, '添加节点');
 			}
 		}
 
@@ -2647,34 +1284,51 @@
 
 		// 设置集合地区选择器
 		function setupCollectionRegionSelector() {
-			// 为集合地区选择器添加事件监听器
-			const collectionOptions = document.querySelectorAll('#collectionRegionOptions .select-option');
-			collectionOptions.forEach(option => {
-				option.addEventListener('click', function () {
-					const value = this.getAttribute('data-value');
-					const text = this.innerHTML;
-					selectCollectionRegionOption(value, text);
-				});
+			const selector = document.getElementById('collectionRegionSelect');
+			const trigger = selector.querySelector('.select-display');
+			const options = Array.from(selector.querySelectorAll('.select-option'));
+			options.forEach(option => {
+				option.addEventListener('click', () => selectCollectionRegionOption(option.dataset.value, option.textContent));
 			});
-
-			// 点击外部关闭下拉菜单
-			document.addEventListener('click', function (event) {
-				const collectionSelect = document.getElementById('collectionRegionSelect');
-				if (collectionSelect && !collectionSelect.contains(event.target)) {
-					document.getElementById('collectionRegionOptions').classList.remove('show');
-					document.querySelector('#collectionRegionSelect .select-display').classList.remove('active');
+			selector.addEventListener('keydown', event => {
+				if (trigger.getAttribute('aria-expanded') !== 'true') return;
+				if (event.key === 'Escape') {
+					event.preventDefault();
+					setCollectionRegionDropdownOpen(false);
+					trigger.focus();
+				} else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+					event.preventDefault();
+					const index = options.indexOf(event.target);
+					const offset = event.key === 'ArrowDown' ? 1 : -1;
+					options[(index + offset + options.length) % options.length]?.focus();
 				}
+			});
+			selector.addEventListener('focusout', event => {
+				if (!selector.contains(event.relatedTarget)) setCollectionRegionDropdownOpen(false);
+			});
+			document.addEventListener('click', event => {
+				if (!selector.contains(event.target)) setCollectionRegionDropdownOpen(false);
 			});
 		}
 
 		// 加载订阅集合列表
 		async function loadSubCollections() {
+			const list = document.getElementById('subCollectionList');
+			list.setAttribute('aria-busy', 'true');
 			try {
 				const response = await fetch('/api/sub-collections');
-				subCollections = await response.json();
+				if (!response.ok) throw new Error('HTTP ' + response.status);
+				const collections = await response.json();
+				if (!Array.isArray(collections)) throw new Error('集合响应格式无效');
+				subCollections = collections;
 				renderSubCollections();
 			} catch (error) {
 				console.error('加载订阅集合失败:', error);
+				showMessage('subCollectionMessage', '加载订阅集合失败，请稍后刷新页面重试', 'error');
+				const loading = list.querySelector('.empty-state[role="status"]');
+				if (loading) loading.textContent = '加载订阅集合失败';
+			} finally {
+				list.setAttribute('aria-busy', 'false');
 			}
 		}
 
@@ -2700,32 +1354,40 @@
 
 				html += '<div class="list-item" data-index="' + i + '">';
 				html += '<div class="item-info">';
-				html += '<div class="item-name">' + collection.name + '</div>';
+				html += '<div class="item-name">' + escapeHtmlText(collection.name) + '</div>';
 				html += '<div class="item-details">订阅数量: ' + subCount + ' | 前缀功能: <span class="' + prefixClass + '">' + prefixStatus + '</span></div>';
-				html += '<div class="item-details" style="font-size: 0.85em; margin-top: 4px;">订阅链接: ' + collectionUrl + '</div>';
+				html += '<div class="item-details item-link">订阅链接: ' + escapeHtmlText(collectionUrl) + '</div>';
 				html += '</div>';
 				html += '<div class="item-actions">';
 				html += '<div class="item-actions-row-1">';
-				html += '<button class="btn clash-import" onclick="importSubCollectionToClash(\'' + collection.id + '\')">导入Clash</button>';
-				html += '<button class="btn" onclick="copySubCollectionLink(\'' + collection.id + '\')">复制链接</button>';
-				html += '<button class="btn" onclick="renameSubCollection(\'' + collection.id + '\')">重命名</button>';
+				html += '<button class="btn clash-import" data-action="importSubCollectionToClash">导入Clash</button>';
+				html += '<button class="btn" data-action="copySubCollectionLink">复制链接</button>';
+				html += '<button class="btn" data-action="renameSubCollection">重命名</button>';
 				html += '</div>';
 				html += '<div class="item-actions-row-2">';
-				html += '<button class="btn" onclick="manageSubCollection(\'' + collection.id + '\')">管理订阅</button>';
-				html += '<button class="btn ' + prefixClass + '" onclick="toggleSubCollectionPrefix(\'' + collection.id + '\')">' + (enablePrefix ? '关闭前缀' : '开启前缀') + '</button>';
-				html += '<button class="btn danger" onclick="deleteSubCollection(\'' + collection.id + '\')">删除</button>';
+				html += '<button class="btn" data-action="manageSubCollection">管理订阅</button>';
+				html += '<button class="btn ' + prefixClass + '" data-action="toggleSubCollectionPrefix">' + (enablePrefix ? '关闭前缀' : '开启前缀') + '</button>';
+				html += '<button class="btn danger" data-action="deleteSubCollection">删除</button>';
 				html += '</div>';
 				html += '</div>';
 				html += '</div>';
 			}
 			listEl.innerHTML = html;
+			const actions = { importSubCollectionToClash, copySubCollectionLink, renameSubCollection, manageSubCollection, toggleSubCollectionPrefix, deleteSubCollection };
+			listEl.querySelectorAll('[data-action]').forEach(button => {
+				const collection = subCollections[Number(button.closest('[data-index]').dataset.index)];
+				button.addEventListener('click', event => actions[button.dataset.action](collection.id, event));
+			});
 		}
 
 		// 创建新的订阅集合
-		async function createSubCollection() {
+		async function createSubCollection(event) {
+			const button = event?.currentTarget;
+			if (button?.disabled) return;
 			const name = prompt('请输入集合名称（留空使用默认名称）:');
 			if (name === null) return; // 用户取消
 
+			setButtonBusy(button, true, '创建中…');
 			try {
 				const response = await fetch('/api/sub-collections', {
 					method: 'POST',
@@ -2743,6 +1405,8 @@
 				}
 			} catch (error) {
 				showMessage('subCollectionMessage', '创建订阅集合失败', 'error');
+			} finally {
+				setButtonBusy(button, false, '创建新集合');
 			}
 		}
 
@@ -2755,11 +1419,13 @@
 		}
 
 		// 复制集合订阅链接
-		function copySubCollectionLink(collectionId) {
+		async function copySubCollectionLink(collectionId) {
 			const origin = window.location.origin;
 			const url = `${origin}/clash/submerge/${collectionId}`;
-			copyToClipboard(url);
-			showMessage('subCollectionMessage', '订阅链接已复制到剪贴板');
+			const copied = await copyToClipboard(url);
+			const message = copied ? '订阅链接已复制到剪贴板' : '复制失败，请检查浏览器剪贴板权限';
+			const type = copied ? 'success' : 'error';
+			showMessage('subCollectionMessage', message, type);
 		}
 
 		// 重命名订阅集合
@@ -2866,12 +1532,12 @@
 			renderCollectionSubscriptions();
 
 			// 显示弹窗
-			document.getElementById('subCollectionModal').style.display = 'block';
+			document.getElementById('subCollectionModal').showModal();
 		}
 
 		// 关闭订阅集合管理弹窗
 		function closeSubCollectionModal() {
-			document.getElementById('subCollectionModal').style.display = 'none';
+			document.getElementById('subCollectionModal').close();
 			currentManagingSubCollection = null;
 		}
 
@@ -2958,16 +1624,16 @@
 
 				html += '<div class="list-item subscription-item' + highlightClass + '" data-index="' + i + '">';
 				// 桌面端复选框
-				html += '<input type="checkbox" class="collection-subscription-checkbox desktop-checkbox" data-index="' + i + '" onchange="syncCheckboxState(' + i + ', \'subscription\')">';
+				html += '<input type="checkbox" aria-label="选择第 ' + (i + 1) + ' 个订阅" class="collection-subscription-checkbox desktop-checkbox" data-index="' + i + '" onchange="syncCheckboxState(' + i + ', \'subscription\', event)">';
 				// 移动端复选框容器
 				html += '<div class="checkbox-wrapper">';
-				html += '<input type="checkbox" class="collection-subscription-checkbox mobile-checkbox" data-index="' + i + '" onchange="syncCheckboxState(' + i + ', \'subscription\')">';
+				html += '<input type="checkbox" aria-label="选择第 ' + (i + 1) + ' 个订阅" class="collection-subscription-checkbox mobile-checkbox" data-index="' + i + '" onchange="syncCheckboxState(' + i + ', \'subscription\', event)">';
 				html += '</div>';
 				html += '<div class="item-info">';
 				html += '<div class="item-name" id="collectionSubName-' + i + '">';
-				html += '<span class="name-text">' + parsed.name + '</span>';
+				html += '<span class="name-text">' + escapeHtmlText(parsed.name) + '</span>';
 				html += '</div>';
-				html += '<div class="item-details">' + sub + '</div>';
+				html += '<div class="item-details">' + escapeHtmlText(sub) + '</div>';
 
 				// 流量和到期信息区域
 				if (parsed.traffic || parsed.expire) {
@@ -2977,7 +1643,7 @@
 					if (parsed.traffic) {
 						html += '<div class="traffic-info">';
 						html += '<span class="traffic-label">📊 流量:</span>';
-						html += '<span class="traffic-value">' + parsed.traffic + '</span>';
+						html += '<span class="traffic-value">' + escapeHtmlText(parsed.traffic) + '</span>';
 						html += '</div>';
 					}
 
@@ -2985,7 +1651,7 @@
 					if (parsed.expire) {
 						html += '<div class="expire-info">';
 						html += '<span class="expire-label">⏰</span>';
-						html += '<span class="expire-value">' + parsed.expire + '</span>';
+						html += '<span class="expire-value">' + escapeHtmlText(parsed.expire) + '</span>';
 						html += '</div>';
 					}
 
@@ -2994,7 +1660,7 @@
 
 				html += '</div>';
 				html += '<div class="item-actions">';
-				html += '<button class="btn" onclick="editCollectionSubscriptionName(' + i + ')">编辑名称</button>';
+				html += '<button class="btn" onclick="editCollectionSubscriptionName(' + i + ', event)">编辑名称</button>';
 				html += '<button class="btn danger" onclick="deleteSingleCollectionSubscription(' + i + ')">删除</button>';
 				html += '</div>';
 				html += '</div>';
@@ -3007,7 +1673,7 @@
 				setTimeout(() => {
 					const listItems = listEl.querySelectorAll('.list-item');
 					if (listItems[firstNewlyAddedIndex]) {
-						listItems[firstNewlyAddedIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+						listItems[firstNewlyAddedIndex].scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
 					}
 				}, 100);
 			}
@@ -3098,7 +1764,7 @@
 		}
 
 		// 复制选中集合订阅的链接
-		function copySelectedCollectionSubscriptions() {
+		async function copySelectedCollectionSubscriptions() {
 			const selectedIndexes = getSelectedCollectionSubscriptionIndexes();
 			if (selectedIndexes.length === 0) {
 				showCollectionSubMessage('请先选择要复制的订阅', 'warning');
@@ -3108,22 +1774,14 @@
 			const selectedUrls = selectedIndexes.map(index => currentManagingSubCollection.subscriptions[index]);
 			const urlsText = selectedUrls.join('\n');
 
-			navigator.clipboard.writeText(urlsText).then(() => {
-				showCollectionSubMessage(`已复制 ${selectedIndexes.length} 个订阅链接`, 'success');
-			}).catch(() => {
-				// 降级方案
-				const textArea = document.createElement('textarea');
-				textArea.value = urlsText;
-				document.body.appendChild(textArea);
-				textArea.select();
-				document.execCommand('copy');
-				document.body.removeChild(textArea);
-				showCollectionSubMessage(`已复制 ${selectedIndexes.length} 个订阅链接`, 'success');
-			});
+			const copied = await copyToClipboard(urlsText);
+			showCollectionSubMessage(copied ? `已复制 ${selectedIndexes.length} 个订阅链接` : '复制失败，请检查浏览器剪贴板权限', copied ? 'success' : 'error');
 		}
 
 		// 删除选中的集合订阅
 		async function deleteSelectedCollectionSubscriptions() {
+			const collectionId = currentManagingSubCollection?.id;
+			if (collectionId == null) return;
 			const selectedIndexes = getSelectedCollectionSubscriptionIndexes();
 			if (selectedIndexes.length === 0) {
 				showCollectionSubMessage('请先选择要删除的订阅', 'warning');
@@ -3137,7 +1795,7 @@
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({
 							action: 'batchDeleteSubscription',
-							collectionId: currentManagingSubCollection.id,
+							collectionId,
 							indexes: selectedIndexes
 						})
 					});
@@ -3148,8 +1806,10 @@
 
 						// 重新加载集合数据并渲染
 						await loadSubCollections();
-						currentManagingSubCollection = subCollections.find(c => c.id === currentManagingSubCollection.id);
-						renderCollectionSubscriptions();
+						if (currentManagingSubCollection?.id === collectionId) {
+							currentManagingSubCollection = subCollections.find(c => c.id === collectionId) || currentManagingSubCollection;
+							renderCollectionSubscriptions();
+						}
 					} else {
 						showCollectionSubMessage(result.error || '删除失败', 'error');
 					}
@@ -3160,12 +1820,14 @@
 		}
 
 		// 复制当前订阅集合链接
-		function copyCurrentSubCollectionLink() {
+		async function copyCurrentSubCollectionLink() {
 			if (!currentManagingSubCollection) return;
 			const origin = window.location.origin;
 			const url = `${origin}/clash/submerge/${currentManagingSubCollection.id}`;
-			copyToClipboard(url);
-			showCollectionSubMessage('订阅链接已复制到剪贴板');
+			const copied = await copyToClipboard(url);
+			const message = copied ? '订阅链接已复制到剪贴板' : '复制失败，请检查浏览器剪贴板权限';
+			const type = copied ? 'success' : 'error';
+			showCollectionSubMessage(message, type);
 		}
 
 		// 显示订阅集合管理消息
@@ -3193,6 +1855,10 @@
 
 		// 向当前集合添加订阅
 		async function addSubscriptionToCurrentCollection() {
+			const collectionId = currentManagingSubCollection?.id;
+			if (collectionId == null) return;
+			const button = document.getElementById('addCollectionSubBtn');
+			if (button?.disabled) return;
 			if (!currentManagingSubCollection) return;
 
 			const subscriptionUrls = document.getElementById('collectionSubUrl').value.trim();
@@ -3209,6 +1875,7 @@
 			clearCollectionSubOutput();
 			addCollectionSubOutput(`开始添加 ${totalUrls} 个订阅到集合: ${currentManagingSubCollection.name}`);
 
+			setButtonBusy(button, true, '添加中…');
 			try {
 				const response = await fetch('/api/sub-collections', {
 					method: 'POST',
@@ -3216,7 +1883,7 @@
 					body: JSON.stringify({
 						action: 'addSubscription',
 						data: {
-							collectionId: currentManagingSubCollection.id,
+							collectionId,
 							subscriptionUrls: subscriptionUrls
 						}
 					})
@@ -3254,7 +1921,7 @@
 					showCollectionSubMessage(message, result.failedCount > 0 ? 'info' : 'success');
 
 					// 清空输入框
-					document.getElementById('collectionSubUrl').value = '';
+					if (currentManagingSubCollection?.id === collectionId) document.getElementById('collectionSubUrl').value = '';
 
 					// 标记新添加的订阅用于高亮显示
 					if (result.addedSubscriptions && result.addedSubscriptions.length > 0) {
@@ -3265,20 +1932,26 @@
 
 					// 重新加载集合数据并渲染
 					await loadSubCollections();
-					currentManagingSubCollection = subCollections.find(c => c.id === currentManagingSubCollection.id);
-					renderCollectionSubscriptions();
+					if (currentManagingSubCollection?.id === collectionId) {
+						currentManagingSubCollection = subCollections.find(c => c.id === collectionId) || currentManagingSubCollection;
+						renderCollectionSubscriptions();
+					}
 				}
 			} catch (error) {
 				addCollectionSubOutput(`添加订阅失败: ${error.message}`, 'error');
 				showCollectionSubMessage('添加订阅失败: ' + error.message, 'error');
+			} finally {
+				setButtonBusy(button, false, '添加订阅');
 			}
 		}
 
 		// 编辑集合中订阅的名称
-		function editCollectionSubscriptionName(index) {
+		function editCollectionSubscriptionName(index, event) {
 			if (!currentManagingSubCollection) return;
 
 			const nameElement = document.getElementById('collectionSubName-' + index);
+			if (nameElement.querySelector('input')) return;
+			const trigger = event?.currentTarget;
 			const currentName = currentManagingSubCollection.subscriptionNames[index] || ('订阅' + (index + 1));
 
 			// 创建输入框
@@ -3286,33 +1959,31 @@
 			input.type = 'text';
 			input.value = currentName;
 			input.className = 'edit-name-input';
-			input.style.cssText = `
-				width: 100%;
-				padding: 4px 8px;
-				border: 1px solid #6B8E9F;
-				border-radius: 4px;
-				font-size: 14px;
-				background: #FFFFFF;
-			`;
+			input.setAttribute('aria-label', '订阅名称');
+			const originalContent = Array.from(nameElement.childNodes);
+			const collection = currentManagingSubCollection;
+			let settled = false;
 
-			// 保存原始内容
-			const originalContent = nameElement.innerHTML;
-
-			// 替换为输入框
-			nameElement.innerHTML = '';
-			nameElement.appendChild(input);
+			nameElement.replaceChildren(input);
 			input.focus();
 			input.select();
 
 			// 处理保存
-			async function saveName() {
+			async function saveName(restoreFocus = false) {
+				if (settled) return;
+				settled = true;
+				if (currentManagingSubCollection !== collection) return;
+				const finish = () => { if (restoreFocus === true) trigger?.focus(); };
 				const newName = input.value.trim();
 				if (newName === '' || newName === currentName) {
 					// 取消编辑，恢复原始内容
-					nameElement.innerHTML = originalContent;
+					nameElement.replaceChildren(...originalContent);
+					finish();
 					return;
 				}
 
+				input.readOnly = true;
+				input.setAttribute('aria-busy', 'true');
 				try {
 					const response = await fetch('/api/sub-collections', {
 						method: 'POST',
@@ -3320,7 +1991,7 @@
 						body: JSON.stringify({
 							action: 'updateSubscriptionName',
 							data: {
-								collectionId: currentManagingSubCollection.id,
+								collectionId: collection.id,
 								index,
 								newName
 							}
@@ -3331,22 +2002,28 @@
 
 					if (result.error) {
 						showCollectionSubMessage(result.error, 'error');
-						nameElement.innerHTML = originalContent;
+						nameElement.replaceChildren(...originalContent);
 					} else {
 						showCollectionSubMessage('订阅名称更新成功');
 						// 更新本地数据
-						currentManagingSubCollection.subscriptionNames[index] = newName;
-						nameElement.innerHTML = newName;
+						collection.subscriptionNames[index] = newName;
+						nameElement.replaceChildren(...originalContent);
+						nameElement.querySelector('.name-text').textContent = newName;
 					}
 				} catch (error) {
 					showCollectionSubMessage('更新订阅名称失败', 'error');
-					nameElement.innerHTML = originalContent;
+					nameElement.replaceChildren(...originalContent);
+				} finally {
+					finish();
 				}
 			}
 
 			// 处理取消
 			function cancelEdit() {
-				nameElement.innerHTML = originalContent;
+				if (settled) return;
+				settled = true;
+				nameElement.replaceChildren(...originalContent);
+				trigger?.focus();
 			}
 
 			// 绑定事件
@@ -3354,7 +2031,7 @@
 			input.addEventListener('keydown', function (e) {
 				if (e.key === 'Enter') {
 					e.preventDefault();
-					saveName();
+					saveName(true);
 				} else if (e.key === 'Escape') {
 					e.preventDefault();
 					cancelEdit();
@@ -3364,6 +2041,8 @@
 
 		// 当前集合的活跃检测
 		async function activeDetectionForCurrentCollection() {
+			const collectionId = currentManagingSubCollection?.id;
+			if (collectionId == null) return;
 			if (!currentManagingSubCollection) return;
 
 			const subscriptions = currentManagingSubCollection.subscriptions;
@@ -3375,8 +2054,8 @@
 			const btn = document.getElementById('currentCollectionActiveDetectionBtn');
 
 			// 禁用按钮并清空操作日志
-			btn.disabled = true;
-			btn.textContent = '检测中...';
+			if (btn.disabled) return;
+			setButtonBusy(btn, true, '检测中…');
 			document.getElementById('collectionSubMessage').style.display = 'none';
 			clearCollectionSubOutput();
 			addCollectionSubOutput(`开始活跃检测集合: ${currentManagingSubCollection.name}，共 ${subscriptions.length} 个订阅`);
@@ -3396,7 +2075,7 @@
 					body: JSON.stringify({
 						action: 'activeDetection',
 						data: {
-							collectionId: currentManagingSubCollection.id,
+							collectionId,
 							results: results
 						}
 					})
@@ -3444,50 +2123,29 @@
 
 					// 重新加载集合数据并渲染
 					await loadSubCollections();
-					currentManagingSubCollection = subCollections.find(c => c.id === currentManagingSubCollection.id);
-					renderCollectionSubscriptions();
+					if (currentManagingSubCollection?.id === collectionId) {
+						currentManagingSubCollection = subCollections.find(c => c.id === collectionId) || currentManagingSubCollection;
+						renderCollectionSubscriptions();
+					}
 				}
 			} catch (error) {
 				addCollectionSubOutput(`活跃检测失败: ${error.message}`, 'error');
 				showCollectionSubMessage('活跃检测失败: ' + error.message, 'error');
 			} finally {
 				// 恢复按钮状态
-				btn.disabled = false;
-				btn.textContent = '活跃检测';
+				setButtonBusy(btn, false, '活跃检测');
 			}
 		}
 
 		// 复制链接
 		function copyLink(elementId) {
 			const linkElement = document.getElementById(elementId);
-			const text = linkElement.textContent;
-
-			navigator.clipboard.writeText(text).then(() => {
-				// 简单的视觉反馈
-				const originalText = linkElement.textContent;
-				linkElement.textContent = '已复制!';
-				linkElement.style.color = '#9CAE9A';
-
+			const originalText = linkElement.textContent;
+			copyToClipboard(originalText).then(copied => {
+				if (!copied) return;
+				linkElement.textContent = '已复制';
 				setTimeout(() => {
 					linkElement.textContent = originalText;
-					linkElement.style.color = '';
-				}, 1000);
-			}).catch(() => {
-				// 降级方案
-				const textArea = document.createElement('textarea');
-				textArea.value = text;
-				document.body.appendChild(textArea);
-				textArea.select();
-				document.execCommand('copy');
-				document.body.removeChild(textArea);
-
-				const originalText = linkElement.textContent;
-				linkElement.textContent = '已复制!';
-				linkElement.style.color = '#9CAE9A';
-
-				setTimeout(() => {
-					linkElement.textContent = originalText;
-					linkElement.style.color = '';
 				}, 1000);
 			});
 		}
@@ -3539,10 +2197,13 @@
 			const timestamp = new Date().toLocaleTimeString();
 			const entry = document.createElement('div');
 			entry.className = `output-entry ${type}`;
-			entry.innerHTML = `
-				<span class="output-time">[${timestamp}]</span>
-				<span class="output-message">${message}</span>
-			`;
+			const time = document.createElement('span');
+			time.className = 'output-time';
+			time.textContent = '[' + timestamp + ']';
+			const content = document.createElement('span');
+			content.className = 'output-message';
+			content.textContent = message;
+			entry.append(time, content);
 
 			outputBox.appendChild(entry);
 			outputBox.scrollTop = outputBox.scrollHeight;
@@ -3557,44 +2218,42 @@
 		// ========== 确认删除弹窗功能 ==========
 
 		let confirmCallback = null;
+		const confirmDialog = document.getElementById('confirmModal');
 
-		// 显示确认删除弹窗
 		function showConfirmModal(message, callback) {
 			document.getElementById('confirmMessage').textContent = message;
-			document.getElementById('confirmModal').style.display = 'block';
 			confirmCallback = callback;
+			confirmDialog.showModal();
 		}
 
-		// 隐藏确认删除弹窗
 		function hideConfirmModal() {
-			document.getElementById('confirmModal').style.display = 'none';
 			confirmCallback = null;
+			confirmDialog.close();
 		}
 
-		// 确认删除
 		function confirmDelete() {
-			if (confirmCallback) {
-				confirmCallback();
-			}
+			const callback = confirmCallback;
 			hideConfirmModal();
+			if (callback) callback();
 		}
 
-		// 点击弹窗外部关闭
-		document.getElementById('confirmModal').addEventListener('click', function (event) {
-			if (event.target === this) {
-				hideConfirmModal();
-			}
-		});
-
-		// ESC键关闭弹窗
-		document.addEventListener('keydown', function (event) {
-			if (event.key === 'Escape' && document.getElementById('confirmModal').style.display === 'block') {
-				hideConfirmModal();
-			}
-		});
+		// 使用原生 modal 的焦点限制和恢复，另行清理关闭后的状态。
+		for (const [dialog, close] of [
+			[confirmDialog, hideConfirmModal],
+			[document.getElementById('proxyCollectionModal'), closeProxyCollectionModal],
+			[document.getElementById('subCollectionModal'), closeSubCollectionModal]
+		]) {
+			dialog.addEventListener('click', event => {
+				if (event.target === dialog) close();
+			});
+			dialog.addEventListener('cancel', event => {
+				event.preventDefault();
+				close();
+			});
+		}
 
 		// 同步桌面端和移动端复选框状态
-		function syncCheckboxState(index, type) {
+		function syncCheckboxState(index, type, event) {
 			let desktopCheckbox, mobileCheckbox;
 
 			if (type === 'proxy') {
@@ -3607,7 +2266,7 @@
 
 			if (desktopCheckbox && mobileCheckbox) {
 				// 同步两个复选框的状态
-				if (event.target.classList.contains('desktop-checkbox')) {
+				if ((event?.currentTarget || desktopCheckbox) === desktopCheckbox) {
 					mobileCheckbox.checked = desktopCheckbox.checked;
 				} else {
 					desktopCheckbox.checked = mobileCheckbox.checked;
@@ -3624,6 +2283,8 @@
 
 		// 删除单个集合节点
 		async function deleteSingleCollectionProxy(index) {
+			const collectionId = currentManagingCollection?.id;
+			if (collectionId == null) return;
 			if (!currentManagingCollection) return;
 
 			const proxy = currentManagingCollection.proxies[index];
@@ -3637,7 +2298,7 @@
 						body: JSON.stringify({
 							action: 'deleteProxy',
 							data: {
-								collectionId: currentManagingCollection.id,
+								collectionId,
 								index: index
 							}
 						})
@@ -3650,8 +2311,10 @@
 
 						// 重新加载集合数据并渲染
 						await loadProxyCollections();
-						currentManagingCollection = proxyCollections.find(c => c.id === currentManagingCollection.id);
-						renderCollectionProxies();
+						if (currentManagingCollection?.id === collectionId) {
+							currentManagingCollection = proxyCollections.find(c => c.id === collectionId) || currentManagingCollection;
+							renderCollectionProxies();
+						}
 					} else {
 						showCollectionMessage(result.error || '删除失败', 'error');
 					}
@@ -3663,6 +2326,8 @@
 
 		// 重命名集合节点
 		async function renameCollectionProxy(index) {
+			const collectionId = currentManagingCollection?.id;
+			if (collectionId == null) return;
 			if (!currentManagingCollection) return;
 
 			const proxy = currentManagingCollection.proxies[index];
@@ -3678,7 +2343,7 @@
 					body: JSON.stringify({
 						action: 'updateProxyName',
 						data: {
-							collectionId: currentManagingCollection.id,
+							collectionId,
 							index: index,
 							newName: newName
 						}
@@ -3692,8 +2357,10 @@
 
 					// 重新加载集合数据并渲染
 					await loadProxyCollections();
-					currentManagingCollection = proxyCollections.find(c => c.id === currentManagingCollection.id);
-					renderCollectionProxies();
+					if (currentManagingCollection?.id === collectionId) {
+						currentManagingCollection = proxyCollections.find(c => c.id === collectionId) || currentManagingCollection;
+						renderCollectionProxies();
+					}
 				} else {
 					showCollectionMessage(result.error || '重命名失败', 'error');
 				}
@@ -3704,6 +2371,8 @@
 
 		// 修改集合节点IP
 		async function changeProxyServer(index) {
+			const collectionId = currentManagingCollection?.id;
+			if (collectionId == null) return;
 			if (!currentManagingCollection) return;
 
 			const proxy = currentManagingCollection.proxies[index];
@@ -3719,7 +2388,7 @@
 					body: JSON.stringify({
 						action: 'updateProxyServer',
 						data: {
-							collectionId: currentManagingCollection.id,
+							collectionId,
 							index: index,
 							newServer: newServer
 						}
@@ -3733,8 +2402,10 @@
 
 					// 重新加载集合数据并渲染
 					await loadProxyCollections();
-					currentManagingCollection = proxyCollections.find(c => c.id === currentManagingCollection.id);
-					renderCollectionProxies();
+					if (currentManagingCollection?.id === collectionId) {
+						currentManagingCollection = proxyCollections.find(c => c.id === collectionId) || currentManagingCollection;
+						renderCollectionProxies();
+					}
 				} else {
 					showCollectionMessage(result.error || '更新服务器失败', 'error');
 				}
@@ -3745,6 +2416,8 @@
 
 		// 删除单个集合订阅
 		async function deleteSingleCollectionSubscription(index) {
+			const collectionId = currentManagingSubCollection?.id;
+			if (collectionId == null) return;
 			if (!currentManagingSubCollection) return;
 
 			const subscription = currentManagingSubCollection.subscriptions[index];
@@ -3759,7 +2432,7 @@
 						body: JSON.stringify({
 							action: 'deleteSubscription',
 							data: {
-								collectionId: currentManagingSubCollection.id,
+								collectionId,
 								index: index
 							}
 						})
@@ -3772,8 +2445,10 @@
 
 						// 重新加载集合数据并渲染
 						await loadSubCollections();
-						currentManagingSubCollection = subCollections.find(c => c.id === currentManagingSubCollection.id);
-						renderCollectionSubscriptions();
+						if (currentManagingSubCollection?.id === collectionId) {
+							currentManagingSubCollection = subCollections.find(c => c.id === collectionId) || currentManagingSubCollection;
+							renderCollectionSubscriptions();
+						}
 					} else {
 						showCollectionSubMessage(result.error || '删除失败', 'error');
 					}
@@ -3786,21 +2461,6 @@
 
 	</script>
 
-	<!-- 确认删除弹窗 -->
-	<div id="confirmModal" class="confirm-modal">
-		<div class="confirm-modal-content">
-			<div class="confirm-modal-header">
-				<h3>⚠️ 确认删除</h3>
-			</div>
-			<div class="confirm-modal-body">
-				<p id="confirmMessage">确定要删除选中的项目吗？</p>
-				<div class="confirm-modal-actions">
-					<button class="confirm-btn secondary" onclick="hideConfirmModal()">取消</button>
-					<button class="confirm-btn danger" id="confirmDeleteBtn" onclick="confirmDelete()">删除</button>
-				</div>
-			</div>
-		</div>
-	</div>
 </body>
 
 </html>
