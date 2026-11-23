@@ -46,6 +46,9 @@ describe('flattened subscription collection config', () => {
 		expect(config['proxy-providers']).toBeUndefined();
 		expect(config.dns['default-nameserver']).toEqual(['223.5.5.5', '1.12.12.12']);
 		expect(config.rules.at(-1)).toBe('MATCH,🚀 默认代理');
+		// 开代理不影响任何 IPv6 地址：顶层开关打开 + 通配直连规则置于首行
+		expect(config.ipv6).toBe(true);
+		expect(config.rules[0]).toBe('IP-CIDR6,::/0,DIRECT,no-resolve');
 		expect(config['proxy-groups'].find(group => group.name === '🌐 全部节点')['include-all-proxies']).toBe(true);
 	});
 
@@ -96,6 +99,26 @@ describe('flattened subscription collection config', () => {
 		expect(response.status).toBe(200);
 		expect(result.successCount).toBe(0);
 		expect(result.failedCount).toBe(1);
+	});
+
+	it('serves stash, sing-box and Quantumult X outputs through the target parameter', async () => {
+		await env.CLASH_KV.put('sub_collections', JSON.stringify([makeCollection()]));
+		fetchMock.get(new URL(feedUrl).origin).intercept({ path: '/subscription' }).reply(200, feeds[0]).persist();
+
+		const stashResponse = await worker.fetch(new Request(`https://clashsub.example/clash/submerge/${collectionId}?target=stash`), env, {});
+		expect(stashResponse.headers.get('X-ClashSub-Target')).toBe('stash');
+		const stash = parseYaml(await stashResponse.text());
+		expect(stash['proxy-groups'].every(group => group['include-all-proxies'] === undefined)).toBe(true);
+
+		const singboxResponse = await worker.fetch(new Request(`https://clashsub.example/clash/submerge/${collectionId}?target=singbox`), env, {});
+		expect(singboxResponse.headers.get('content-type')).toContain('application/json');
+		const singbox = await singboxResponse.json();
+		expect(singbox.outbounds.some(outbound => outbound.tag === '[Japan]JP-01')).toBe(true);
+		expect(singbox.route.final).toBe('🚀 默认代理');
+
+		const qxResponse = await worker.fetch(new Request(`https://clashsub.example/clash/submerge/${collectionId}?target=qx`), env, {});
+		expect(qxResponse.headers.get('content-type')).toContain('text/plain');
+		expect(await qxResponse.text()).toContain('vless=');
 	});
 
 	it('supports subscription URI lists and keeps globally unique node names', async () => {

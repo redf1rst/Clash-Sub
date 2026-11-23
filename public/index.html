@@ -134,6 +134,37 @@
 		.btn-icon { min-width: 44px; padding: .15rem .45rem; }
 		.btn.small { padding-inline: .65rem; }
 
+		.import-menu {
+			position: fixed;
+			z-index: 4000;
+			width: min(20rem, calc(100vw - 1.5rem));
+			padding: .3rem;
+			border: 1px solid var(--control-line);
+			border-radius: 10px;
+			background: var(--paper);
+			box-shadow: 0 16px 38px #102f2629;
+		}
+		.import-menu[hidden] { display: none; }
+		.import-menu-item {
+			display: grid;
+			gap: .1rem;
+			width: 100%;
+			min-height: 44px;
+			padding: .5rem .7rem;
+			border: 0;
+			border-radius: 7px;
+			background: transparent;
+			color: var(--ink);
+			font: inherit;
+			text-align: start;
+			cursor: pointer;
+		}
+		.import-menu-item:hover, .import-menu-item:focus-visible { background: var(--sage); outline: none; }
+		.import-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--pine); }
+		.import-menu-label { font-size: .875rem; font-weight: 700; color: var(--pine); }
+		.import-menu-hint { font-size: .75rem; color: var(--muted); }
+		.import-menu-sep { height: 1px; margin: .25rem .45rem; background: var(--line); }
+
 		.list { display: grid; gap: .6rem; margin-top: .75rem; }
 		.list-item, .empty-state { padding: clamp(.75rem, 2vw, 1.15rem); border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
 		.list-item { display: grid; align-items: center; gap: .65rem; min-width: 0; }
@@ -660,7 +691,7 @@
 				html += '</div>';
 				html += '<div class="item-actions">';
 				html += '<div class="item-actions-row-1">';
-				html += '<button class="btn clash-import" data-action="importToClash">导入Clash</button>';
+				html += '<button class="btn clash-import" data-action="openImportMenu" data-kind="proxy" aria-haspopup="menu">导入订阅</button>';
 				html += '<button class="btn" data-action="copyCollectionLink">复制链接</button>';
 				html += '</div>';
 				html += '<div class="item-actions-row-2">';
@@ -672,10 +703,10 @@
 				html += '</div>';
 			}
 			listEl.innerHTML = html;
-			const actions = { importToClash, copyCollectionLink, manageCollection, renameCollection, deleteCollection };
+			const actions = { openImportMenu, copyCollectionLink, manageCollection, renameCollection, deleteCollection };
 			listEl.querySelectorAll('[data-action]').forEach(button => {
 				const collection = proxyCollections[Number(button.closest('[data-index]').dataset.index)];
-				button.addEventListener('click', event => actions[button.dataset.action](collection.id, event));
+				button.addEventListener('click', event => actions[button.dataset.action](collection.id, event, 'proxy'));
 			});
 		}
 
@@ -718,13 +749,155 @@
 			return `${scheme}://install-config?url=${encodedUrl}`;
 		}
 
-		// 导入到Clash（节点集合）
-		function importToClash(collectionId) {
-			const origin = window.location.origin;
-			const subscriptionUrl = `${origin}/clash/proxies/${collectionId}`;
-			const clashScheme = generateClashScheme(subscriptionUrl);
-			window.location.href = clashScheme;
+		// 支持的客户端及导入方案
+		const IMPORT_CLIENTS = [
+			{ id: 'clash', label: 'Clash / Mihomo', hint: 'Clash Verge · FlClash · mihomo' },
+			{ id: 'clashmi', label: 'Clash Mi（iOS）', hint: '与 Stash 冲突时用这个' },
+			{ id: 'stash', label: 'Stash', hint: 'iPhone · iPad · Mac' },
+			{ id: 'shadowrocket', label: 'Shadowrocket', hint: 'iPhone · iPad' },
+			{ id: 'singbox', label: 'sing-box', hint: 'SFI · SFA · SFM' },
+			{ id: 'qx', label: 'Quantumult X', hint: '仅支持 ss/vmess/trojan' }
+		];
+
+		function base64EncodeUtf8(text) {
+			const bytes = new TextEncoder().encode(text);
+			let binary = '';
+			for (const byte of bytes) binary += String.fromCharCode(byte);
+			return btoa(binary);
 		}
+
+		function buildSubscriptionUrl(kind, collectionId, target) {
+			const path = kind === 'proxy' ? '/clash/proxies/' : '/clash/submerge/';
+			const base = `${window.location.origin}${path}${collectionId}`;
+			// Clash Mi 与 Clash 共用同一份 mihomo 配置
+			return target === 'clash' || target === 'clashmi' ? base : `${base}?target=${encodeURIComponent(target)}`;
+		}
+
+		// 部分客户端支持 URL Scheme 直接拉取订阅；失败时用户可改用复制链接
+		function buildImportScheme(target, subscriptionUrl, name) {
+			const encodedUrl = encodeURIComponent(subscriptionUrl);
+			const encodedName = encodeURIComponent(name || '');
+			switch (target) {
+				case 'clashmi':
+					return `clashmi://install-config?url=${encodedUrl}&name=${encodedName}`;
+				case 'stash':
+					return `stash://install-config?url=${encodedUrl}&name=${encodedName}`;
+				case 'shadowrocket':
+					return `shadowrocket://add/sub://${base64EncodeUtf8(subscriptionUrl)}?remark=${encodedName}`;
+				case 'singbox':
+					return `sing-box://import-remote-profile?url=${encodedUrl}&name=${encodedName}`;
+				case 'qx': {
+					const rulesUrl = `${subscriptionUrl}&part=rules`;
+					const payload = JSON.stringify({ server_remote: [`${subscriptionUrl}, tag=${name}`], filter_remote: [rulesUrl] });
+					return `quantumult-x:///add-resource?remote-resource=${encodeURIComponent(payload)}`;
+				}
+				default:
+					return `${generateClashScheme(subscriptionUrl)}&name=${encodedName}`;
+			}
+		}
+
+		let activeImportMenu = null;
+
+		function closeImportMenu() {
+			if (!activeImportMenu) return;
+			activeImportMenu.menu.remove();
+			activeImportMenu = null;
+		}
+
+		// 打开“导入订阅”客户端菜单
+		function openImportMenu(collectionId, event, kind = 'proxy') {
+			const anchor = event?.currentTarget;
+			const collectionName = (kind === 'sub' ? subCollections : proxyCollections)
+				.find(item => item.id === collectionId)?.name || 'clashsub';
+			closeImportMenu();
+
+			const menu = document.createElement('div');
+			menu.className = 'import-menu';
+			menu.setAttribute('role', 'menu');
+			menu.setAttribute('aria-label', '选择导入的客户端');
+
+			const items = [];
+			const addItem = (labelText, hintText, onSelect) => {
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.className = 'import-menu-item';
+				button.setAttribute('role', 'menuitem');
+				const label = document.createElement('span');
+				label.className = 'import-menu-label';
+				label.textContent = labelText;
+				const hint = document.createElement('span');
+				hint.className = 'import-menu-hint';
+				hint.textContent = hintText;
+				button.append(label, hint);
+				button.addEventListener('click', onSelect);
+				menu.appendChild(button);
+				items.push(button);
+				return button;
+			};
+
+			for (const client of IMPORT_CLIENTS) {
+				addItem(client.label, client.hint, () => {
+					closeImportMenu();
+					const url = buildSubscriptionUrl(kind, collectionId, client.id);
+					window.location.href = buildImportScheme(client.id, url, collectionName);
+				});
+			}
+
+			const separator = document.createElement('div');
+			separator.className = 'import-menu-sep';
+			separator.setAttribute('role', 'separator');
+			menu.appendChild(separator);
+
+			addItem('复制 Clash 订阅链接', '手动粘贴到任意客户端', async () => {
+				closeImportMenu();
+				const copied = await copyToClipboard(buildSubscriptionUrl(kind, collectionId, 'clash'));
+				const messageId = kind === 'sub' ? 'subCollectionMessage' : 'collectionMessage';
+				showMessage(messageId, copied ? '订阅链接已复制到剪贴板' : '复制失败，请检查浏览器剪贴板权限', copied ? 'success' : 'error');
+			});
+
+			document.body.appendChild(menu);
+
+			// 贴住按钮下方，空间不足时向上翻转
+			const rect = anchor?.getBoundingClientRect();
+			if (rect) {
+				const menuRect = menu.getBoundingClientRect();
+				const left = Math.min(Math.max(8, rect.left), Math.max(8, window.innerWidth - menuRect.width - 8));
+				const flipUp = window.innerHeight - rect.bottom < menuRect.height + 12 && rect.top > menuRect.height + 12;
+				const top = flipUp ? rect.top - menuRect.height - 8 : rect.bottom + 8;
+				menu.style.left = `${left}px`;
+				menu.style.top = `${Math.max(8, top)}px`;
+			}
+
+			activeImportMenu = { menu, anchor, items };
+			items[0].focus({ preventScroll: true });
+
+			menu.addEventListener('keydown', keyEvent => {
+				const index = items.indexOf(document.activeElement);
+				if (keyEvent.key === 'Escape') {
+					keyEvent.preventDefault();
+					keyEvent.stopPropagation();
+					closeImportMenu();
+					anchor?.focus({ preventScroll: true });
+				} else if (keyEvent.key === 'ArrowDown' || keyEvent.key === 'ArrowUp') {
+					keyEvent.preventDefault();
+					const step = keyEvent.key === 'ArrowDown' ? 1 : -1;
+					items[(index + step + items.length) % items.length].focus({ preventScroll: true });
+				} else if (keyEvent.key === 'Tab') {
+					closeImportMenu();
+				}
+			});
+		}
+
+		document.addEventListener('pointerdown', event => {
+			if (!activeImportMenu) return;
+			if (activeImportMenu.menu.contains(event.target) || activeImportMenu.anchor?.contains(event.target)) return;
+			closeImportMenu();
+		});
+		document.addEventListener('keydown', event => {
+			if (event.key === 'Escape') closeImportMenu();
+		});
+		window.addEventListener('resize', closeImportMenu);
+		window.addEventListener('scroll', closeImportMenu, true);
 
 		// 复制集合订阅链接
 		async function copyCollectionLink(collectionId) {
@@ -1360,7 +1533,7 @@
 				html += '</div>';
 				html += '<div class="item-actions">';
 				html += '<div class="item-actions-row-1">';
-				html += '<button class="btn clash-import" data-action="importSubCollectionToClash">导入Clash</button>';
+				html += '<button class="btn clash-import" data-action="openImportMenu" data-kind="sub" aria-haspopup="menu">导入订阅</button>';
 				html += '<button class="btn" data-action="copySubCollectionLink">复制链接</button>';
 				html += '<button class="btn" data-action="renameSubCollection">重命名</button>';
 				html += '</div>';
@@ -1373,10 +1546,10 @@
 				html += '</div>';
 			}
 			listEl.innerHTML = html;
-			const actions = { importSubCollectionToClash, copySubCollectionLink, renameSubCollection, manageSubCollection, toggleSubCollectionPrefix, deleteSubCollection };
+			const actions = { openImportMenu, copySubCollectionLink, renameSubCollection, manageSubCollection, toggleSubCollectionPrefix, deleteSubCollection };
 			listEl.querySelectorAll('[data-action]').forEach(button => {
 				const collection = subCollections[Number(button.closest('[data-index]').dataset.index)];
-				button.addEventListener('click', event => actions[button.dataset.action](collection.id, event));
+				button.addEventListener('click', event => actions[button.dataset.action](collection.id, event, 'sub'));
 			});
 		}
 
@@ -1408,14 +1581,6 @@
 			} finally {
 				setButtonBusy(button, false, '创建新集合');
 			}
-		}
-
-		// 导入到Clash（订阅集合）
-		function importSubCollectionToClash(collectionId) {
-			const origin = window.location.origin;
-			const subscriptionUrl = `${origin}/clash/submerge/${collectionId}`;
-			const clashScheme = generateClashScheme(subscriptionUrl);
-			window.location.href = clashScheme;
 		}
 
 		// 复制集合订阅链接
@@ -1580,6 +1745,14 @@
 				.trim();
 
 			return result;
+		}
+
+		function composeSubscriptionName(baseName, metadata) {
+			const suffix = [
+				metadata.traffic ? `[${metadata.traffic}]` : '',
+				metadata.expire ? `(${metadata.expire})` : ''
+			].filter(Boolean).join(' ');
+			return suffix ? `${baseName} ${suffix}` : baseName;
 		}
 
 		// 解析流量值（支持GB、MB等单位）
@@ -1952,7 +2125,9 @@
 			const nameElement = document.getElementById('collectionSubName-' + index);
 			if (nameElement.querySelector('input')) return;
 			const trigger = event?.currentTarget;
-			const currentName = currentManagingSubCollection.subscriptionNames[index] || ('订阅' + (index + 1));
+			const currentFullName = currentManagingSubCollection.subscriptionNames[index] || ('订阅' + (index + 1));
+			const currentParsedName = parseSubscriptionName(currentFullName);
+			const currentName = currentParsedName.name;
 
 			// 创建输入框
 			const input = document.createElement('input');
@@ -1982,6 +2157,7 @@
 					return;
 				}
 
+				const updatedFullName = composeSubscriptionName(newName, currentParsedName);
 				input.readOnly = true;
 				input.setAttribute('aria-busy', 'true');
 				try {
@@ -1993,7 +2169,7 @@
 							data: {
 								collectionId: collection.id,
 								index,
-								newName
+								newName: updatedFullName
 							}
 						})
 					});
@@ -2006,7 +2182,7 @@
 					} else {
 						showCollectionSubMessage('订阅名称更新成功');
 						// 更新本地数据
-						collection.subscriptionNames[index] = newName;
+						collection.subscriptionNames[index] = updatedFullName;
 						nameElement.replaceChildren(...originalContent);
 						nameElement.querySelector('.name-text').textContent = newName;
 					}

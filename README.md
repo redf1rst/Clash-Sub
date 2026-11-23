@@ -57,6 +57,27 @@
 - **批量操作**：支持订阅的批量复制/删除操作
 - **自定义操作**: 节点名称前是否添加前缀
 
+### 多客户端订阅
+
+同一个集合可按客户端输出不同格式，管理页的“导入订阅”按钮会列出可选客户端：
+
+| 客户端 | 订阅地址 | 说明 |
+| --- | --- | --- |
+| Clash / Mihomo | `/clash/{proxies\|submerge}/{id}` | 原始模板，包含完整 DNS 与规则 |
+| Stash | `/clash/{proxies\|submerge}/{id}?target=stash` | 保留 `include-all` 与 `filter`；MRS 规则集改写为 YAML；`classical` 混合规则集换成等价 `geosite` 域名集 |
+| Shadowrocket | `?target=shadowrocket` | 与 Stash 相同的兼容版 Clash YAML（尽力而为） |
+| sing-box | `?target=singbox` | 完整 JSON：策略组映射为 selector/urltest，规则映射为 route rules，`RULE-SET` 映射为同名 `.srs` |
+| Quantumult X | `?target=qx` / `?target=qx&part=rules` | 前者是节点列表（server_remote），后者是含 `[policy]`+`[filter_local]` 的配置（filter_remote） |
+
+sing-box 与 Quantumult X 不支持的协议会被跳过，跳过数量通过 `X-ClashSub-Skipped` 响应头返回。
+
+各客户端与 mihomo 的固有差异：
+
+- **Stash**：不支持 MRS，规则集统一换 YAML；`rule-set:` 形式的 DNS policy 无法表达。
+- **sing-box**：`RULE-SET` 按名字映射到 MetaCubeX 的 `.srs`；第三方规则集（如 `CNcidr`、广告拦截）使用等价上游集合，`Fakeip_Filter`、`STUN` 无对应物会被丢弃。
+- **Quantumult X**：没有远程规则集概念，`RULE-SET` 类规则无法在内联 filter 中表达，只保留域名/IP/GEOIP 类内联规则。
+
+
 ###  访问令牌认证
 - **Cookie认证**：基于访问令牌(Token)的Cookie认证保护,Cookie默认有效期30天
 
