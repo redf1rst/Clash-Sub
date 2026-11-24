@@ -1,195 +1,110 @@
-# Clash订阅生成器
+# Clash Sub
 
-一个部署在Cloudflare Workers上的Clash系订阅转换工具，支持节点集合和订阅集合。
+部署在 Cloudflare Workers 上的节点与订阅聚合工具。使用 KV 保存集合数据，生成适用于不同代理客户端的订阅配置。
 
+## 功能
 
-<div align="center">
-  <table border="0" style="border-collapse: collapse;">
-    <tr>
-      <td align="center">
-        <img src="https://github.com/redf1rst/Clash-Sub/blob/main/img/%E9%9B%86%E5%90%88%E7%95%8C%E9%9D%A2.png?raw=true" alt="collection" width="700">
-      </td>
-    </tr>
-    <tr>
-      <td align="center" style="padding-top: 5px;">
-        <em><small>集合页面</small></em>
-      </td>
-    </tr>
-  </table>
-</div>
+- 管理多个节点集合和订阅集合。
+- 导入代理链接、JSON 节点及混合内容，支持去重、重命名和服务器地址修改。
+- 合并 Clash YAML/JSON、Base64 和代理链接订阅。
+- 更新配置时刷新来源订阅，来源失败时回退到最近成功的缓存。
+- 提供地区识别、订阅名称前缀、批量操作和订阅活跃检测。
+- 使用访问令牌保护管理页面和管理 API。
 
-<br>
+支持 VMess、VLESS、SS、SSR、Trojan、Hysteria、Hysteria2、TUIC、SOCKS5、HTTP、Snell、WireGuard、Mieru、AnyTLS 和 SSH。实际可用协议取决于客户端及核心版本。
 
-<div align="center">
-  <table border="0" style="border-collapse: collapse;">
-    <tr>
-      <td align="center">
-        <img src="https://github.com/redf1rst/Clash-Sub/blob/main/img/%E7%AE%A1%E7%90%86%E7%AA%97%E5%8F%A3.png?raw=true" alt="manager" width="700">
-      </td>
-    </tr>
-    <tr>
-      <td align="center" style="padding-top: 5px;">
-        <em><small>管理窗口</small></em>
-      </td>
-    </tr>
-  </table>
-</div>
+## 部署
 
----
+需要 Node.js 和 Cloudflare 账号。
 
-## 🌟 功能特性
-
-###  节点集合管理
-- **节点合并**：管理零散节点,整合为一个订阅配置
-- **协议支持**：vmess, vless, ss, ssr, hysteria, hysteria2, trojan, tuic
-- **自定义操作**: 支持节点重命名和IP/域名更改(用于优选)
-- **智能命名**：自动识别节点地区并统一命名 (可能因服务器非落地节点而有误,出错请自行更改)
-- **混合格式**：支持链接格式和JSON格式(单行)节点的混合添加
-- **批量操作**：支持节点的批量复制/删除操作
-
-### 订阅集合管理
-- **订阅合并**：多订阅解析后合并到 `proxies`，客户端打开代理列表更直接
-- **格式识别**：Clash YAML/JSON、Base64 订阅和逐行代理链接
-- **自动更新**：Clash 客户端每次更新配置时 Worker 拉取最新来源，并缓存最近一次成功结果用于短暂故障回退
-- **源地址约束**：仅接受 HTTP/HTTPS 公网订阅地址；本机、内网、保留地址以及重定向到这些地址的请求会被过滤
-- **规则配置**：继续使用项目内置 DNS、策略组与自定义规则
-- **活跃检测**：支持检测订阅连通性和有效性 (可能不太准确,谨慎使用)
-- **批量操作**：支持订阅的批量复制/删除操作
-- **自定义操作**: 节点名称前是否添加前缀
-
-### 多客户端订阅
-
-同一个集合可按客户端输出不同格式，管理页的“导入订阅”按钮会列出可选客户端：
-
-| 客户端 | 订阅地址 | 说明 |
-| --- | --- | --- |
-| Clash / Mihomo | `/clash/{proxies\|submerge}/{id}` | 原始模板，包含完整 DNS 与规则 |
-| Stash | `/clash/{proxies\|submerge}/{id}?target=stash` | 保留 `include-all` 与 `filter`；MRS 规则集改写为 YAML；`classical` 混合规则集换成等价 `geosite` 域名集 |
-| Shadowrocket | `?target=shadowrocket` | 与 Stash 相同的兼容版 Clash YAML（尽力而为） |
-| sing-box | `?target=singbox` | 完整 JSON：策略组映射为 selector/urltest，规则映射为 route rules，`RULE-SET` 映射为同名 `.srs` |
-| Quantumult X | `?target=qx` / `?target=qx&part=rules` | 前者是节点列表（server_remote），后者是含 `[policy]`+`[filter_local]` 的配置（filter_remote） |
-
-sing-box 与 Quantumult X 不支持的协议会被跳过，跳过数量通过 `X-ClashSub-Skipped` 响应头返回。
-
-各客户端与 mihomo 的固有差异：
-
-- **Stash**：不支持 MRS，规则集统一换 YAML；`rule-set:` 形式的 DNS policy 无法表达。
-- **sing-box**：`RULE-SET` 按名字映射到 MetaCubeX 的 `.srs`；第三方规则集（如 `CNcidr`、广告拦截）使用等价上游集合，`Fakeip_Filter`、`STUN` 无对应物会被丢弃。
-- **Quantumult X**：没有远程规则集概念，`RULE-SET` 类规则无法在内联 filter 中表达，只保留域名/IP/GEOIP 类内联规则。
-
-
-###  访问令牌认证
-- **Cookie认证**：基于访问令牌(Token)的Cookie认证保护,Cookie默认有效期30天
-
-
-## 项目维护与模块结构
-
-[Worker 入口](<src/index.js>) 仅负责路由、认证和静态资源分发，业务逻辑按 API、集合管理、旧版兼容、协议解析、订阅处理、配置生成及工具模块拆分。完整说明见 [模块维护文档](<ARCHITECTURE.md>)。
-
-两类集合共享 [分流规则工厂](<src/config/rules.js>) 与 [规则提供者工厂](<src/config/rule-providers.js>)，DNS 和代理组保留各自配置。规则已移除 IPv6 全直连；组播/内网 IP 规则使用 `no-resolve`，明确域名规则优先于 IP 兜底。其它 DNS、节点、代理组及客户端输出语义保持原样。
+### 1. 安装依赖
 
 ```bash
-# 一次性运行本地 Workers 回归测试
+git clone https://github.com/redf1rst/Clash-Sub.git
+cd Clash-Sub
+npm ci
+npx wrangler login
+```
+
+### 2. 配置 KV
+
+复制 [wrangler.example.toml](<wrangler.example.toml>) 为 [wrangler.toml](<wrangler.toml>)，然后创建 KV 命名空间：
+
+```bash
+npx wrangler kv namespace create CLASH_KV
+```
+
+将返回的命名空间 ID 填入 `kv_namespaces.id`，保持绑定名称为 `CLASH_KV`。已有部署应沿用原命名空间，避免丢失对原数据的访问。
+
+### 3. 设置令牌并发布
+
+在 [Wrangler 配置](<wrangler.toml>) 中保持 `ACCESS_TOKEN_ENABLED = "true"`。生产令牌通过 Secret 设置，不要提交到仓库：
+
+```bash
+npx wrangler secret put ACCESS_TOKEN
+npm run deploy
+```
+
+首次使用时按 Wrangler 提示创建 Worker。部署完成后，打开输出的访问地址并输入令牌。
+
+本地调试使用配置中的 `ACCESS_TOKEN_DEV`：
+
+```bash
+npm run dev
+```
+
+## 使用
+
+1. 创建节点集合或订阅集合。
+2. 添加代理节点或订阅链接。
+3. 根据需要调整节点名称、服务器地址或订阅名称前缀。
+4. 在“导入订阅”中选择客户端，导入或复制订阅地址。
+5. 修改配置或更新来源后，在客户端刷新订阅。
+
+集合订阅地址：
+
+```text
+/clash/proxies/{collectionId}
+/clash/submerge/{collectionId}
+```
+
+启用认证后，管理功能需要登录；集合订阅地址允许客户端直接访问。请勿公开敏感订阅链接。
+
+## 客户端输出
+
+在集合订阅地址后追加对应参数：
+
+| 客户端 | 参数 | 输出 |
+| --- | --- | --- |
+| Clash / Mihomo | 不追加参数 | Clash YAML，包含 DNS、代理组和规则 |
+| Stash | `?target=stash` | 兼容 YAML |
+| Shadowrocket | `?target=shadowrocket` | 与 Stash 相同的兼容 YAML，兼容性有限 |
+| sing-box | `?target=singbox` | JSON 配置 |
+| Quantumult X | `?target=qx` | 节点列表 |
+| Quantumult X 规则 | `?target=qx&part=rules` | 策略与分流配置 |
+
+sing-box 可使用 `&tun=1` 生成 TUN 入站，或使用 `&profile=minimal` 生成诊断配置。
+
+各客户端并非完全等价。部分规则会被替换或省略，不支持的节点可能被跳过。sing-box 和 Quantumult X 的跳过数量通过 `X-ClashSub-Skipped` 响应头返回。Quantumult X 输出不展开远程规则集。
+
+## 开发与维护
+
+[入口文件](<src/index.js>) 只负责路由、认证和静态资源分发。业务按 API、集合、协议解析、订阅服务、配置和工具模块拆分，详见 [架构说明](<ARCHITECTURE.md>)。
+
+两类集合共享 [分流规则](<src/config/rules.js>) 和 [规则提供者](<src/config/rule-providers.js>)，各自保留 DNS 和代理组配置。[DNS 配置](<src/config/dns.js>) 已移除上游地址中的 IPv6 解析限制；未关闭全局 IPv6，也未添加 IPv6 全直连规则。
+
+```bash
+# 运行本地回归测试
 npm test -- --run
-# 只检查 Worker 打包，不发布
+# 检查打包，不发布
 npx wrangler deploy --dry-run
 ```
 
-测试使用合成节点、模拟订阅和本地 KV；配置基线覆盖两类集合的多客户端输出，避免重构引入配置漂移。
+测试使用合成节点、模拟订阅和本地 KV。[配置基线说明](<test/fixtures/BASELINE.md>) 用于防止未经授权的输出变更。
 
-## 部署步骤
+## 注意事项
 
-### 1. 克隆项目到本地
-```bash
-git clone https://github.com/redf1rst/clash-sub.git
-```
-```bash
-cd clash-sub
-```
-
-### 2. 安装wangler
-```bash
-# 安装 wrangler
-npm install -g wrangler
-
-# 登录 wrangler
-wrangler login
-```
-
-### 3. 创建KV命名空间
-```bash
-# 创建生产环境KV,并记下KV命名空间ID
-wrangler kv namespace create "CLASH_KV"
-```
-
-### 4. 更新 wrangler.toml 配置文件
-复制 wrangler.example.toml 到 wrangler.toml,
-将上一步获得的KV命名空间ID填入 wrangler.toml 文件中：
-```toml
-# Worker名称 (可选修改)
-name = "clash-sub"
-
-# KV命名空间配置
-[[kv_namespaces]]
-binding = "CLASH_KV"
-id = "你的KV命名空间ID"
-
-[vars]
-ACCESS_TOKEN_ENABLED = "true" # 启用令牌验证
-```
-
-### 5. 配置访问令牌
-
-**方式一：使用 Secrets (推荐)**
-```bash
-# 设置访问令牌
-wrangler secret put ACCESS_TOKEN
-# 输入: your-secret-token
-```
-
-**方式二：使用环境变量 (仅本地开发)**
-```toml
-# 在 wrangler.toml 中添加 (不要提交到Git)
-[vars]
-ACCESS_TOKEN_DEV = "your-secret-token"
-```
-
-### 6. 部署
-```bash
-# 直接部署到 Cloudflare Workers
-wrangler deploy
-
-# 或者先本地测试
-wrangler dev
-```
-部署后使用worker链接登录管理页面
-
-### 7. 兼容性问题
-由于本项目是部署在Cloudflare Worker的项目,部分订阅提供者会使用Cloudflare的服务,可能会导致订阅添加失败
-解决方案:没啥好办法解决:(,可以单独去把订阅链接的节点信息提出来,通过节点集合添加到新的订阅里.
-
-
-### 版本历史
-
-- **v3.6**
-  -  **访问令牌认证**：Cookie令牌认证保护管理页面
-  -  **增加自定义**: 节点集合支持优选IP和重命名,订阅集合支持是否在节点名称前添加前缀
-  -  **界面优化**：改善了一些UI
-
-- **v3.0**
-  -  **集合管理**：创建和管理多个独立的订阅配置
-  -  **混合格式支持**：同时支持链接格式和JSON格式节点的混合添加
-  -  **自动节点命名**：节点自动地区检测和统一命名（如：US美国001-IPv6）
-  -  **界面优化**：改善了一些UI
-
-- **v2.0**
-  -  **批量操作**：支持节点和订阅的批量复制、删除
-  -  **稳定性提升**：修复各种边界情况和错误处理
-
-- **v1.0**
-  -  **节点整合**：支持vmess、vless、ss、hysteria2、trojan、tuic等协议
-  -  **订阅整合**：基于自用的配置模板
-  -  **地区识别**：少量的地区映射
-  -  **去重功能**：自动过滤重复的节点和订阅
-
-
+- 地区识别可能不准确，可手动修改节点名称。
+- 订阅活跃检测不代表所有节点都可用。
+- 来源站点的访问限制可能导致 Worker 拉取失败，可改用节点集合导入。
+- DNS、规则、协议和 TUN 的实际行为受客户端版本与网络环境影响。

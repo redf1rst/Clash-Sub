@@ -5,8 +5,9 @@ import worker from '../src/index.js';
 import baseline from './fixtures/authorized-config-baseline.json';
 import { collectionId, configUrl, expectAuthorizedRules, makeEnv, mockFeeds, variants } from './fixtures/authorized-config.js';
 
-// Read-only expectations captured by Lead from authorized, still-monolithic index.js.
-// Never regenerate this fixture from modularized code to make a regression pass.
+// Fixed expectations originate from the authorized, still-monolithic Worker.
+// DNS suffix removal was derived from verified old bodies; see fixtures/BASELINE.md.
+// Never regenerate this fixture from current output to hide a regression.
 async function responseFingerprint(response) {
   const body = await response.arrayBuffer();
   const digest = await crypto.subtle.digest('SHA-256', body);

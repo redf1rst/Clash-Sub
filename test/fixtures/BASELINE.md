@@ -1,11 +1,15 @@
-# Authorized collection response baseline
+# 配置响应回归基线
 
-[authorized-config-baseline.json](<authorized-config-baseline.json>) is a byte-identical copy of Lead's 37-response capture from the authorized, **still-monolithic** Worker. The capture completed before module extraction; tests compare current responses against these fixed values, never generate expectations from current output.
+[响应基线](<authorized-config-baseline.json>) 包含两类集合的 37 组固定响应，检查完整正文 SHA256、字节数、状态码和全部响应头。
 
-Captured JSON SHA256: `064b26a74f60dc36a03b035d462c728216b64f04380db6a3617e98d244b28dc0`.
+原始基线在规则调整后、入口模块化前捕获，文件 SHA256 为 `064b26a74f60dc36a03b035d462c728216b64f04380db6a3617e98d244b28dc0`。
 
-[authorized-config.js](<authorized-config.js>) preserves the exact synthetic inputs used in that capture. [config-baseline.spec.js](<../config-baseline.spec.js>) runs the requests with memory KV and Cloudflare fetchMock, with real networking disabled. It checks complete response-body SHA256 and byte length, HTTP status and every response header.
+本次用户授权删除 DNS 上游地址中的 `#disable-ipv6=true`。先验证修改前的 37 组响应与原始基线一致，再只对旧正文中的这两个完整 DNS 地址移除后缀，计算新期望值。修改后的实现经逐字节对比通过后才更新基线：16 组正文仅有此项变化，21 组保持不变，全部状态码和响应头不变。没有从修改后的输出盲目重生成期望值。
 
-Coverage: both collection types, Clash/default/unknown fallback, Stash, Shadowrocket, sing-box (normal/TUN/minimal), Quantumult X servers/rules/alias, prefix disabled, successful source refresh/cache fallback/uncached failure, missing and empty collections. Additional checks enforce authorized rule ordering and no-resolve changes and exercise cross-target requests against the same KV to catch mutable configuration reuse.
+当前基线文件 SHA256：`89ed2f8c10952aed6fd4e5f654473c1b929e6a8ab60296d7d83af3279b276c04`。
 
-Do not overwrite this baseline after refactoring to make failing tests pass. Any future intentionally authorized behavior change requires independent review of expected differences.
+[合成输入](<authorized-config.js>) 与原捕获一致。[回归测试](<../config-baseline.spec.js>) 使用内存 KV 和 Cloudflare fetchMock，禁用真实联网。
+
+覆盖默认输出、Clash、Stash、Shadowrocket、sing-box 的普通/TUN/诊断配置、Quantumult X 节点/规则/别名、前缀关闭、缓存回退、空集合和不存在的集合。同时检查授权规则、DNS 地址和跨格式请求的对象隔离。
+
+不要通过自动更新基线掩盖回归。未来主动改变行为时，必须先独立核对授权范围及预期差异。

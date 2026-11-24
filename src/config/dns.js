@@ -16,8 +16,8 @@ export function buildProxyDNS() {
 			'1.12.12.12',
 		],
 		nameserver: [
-			'https://8.8.8.8/dns-query#disable-ipv6=true',
-			'https://1.1.1.1/dns-query#disable-ipv6=true',
+			'https://8.8.8.8/dns-query',
+			'https://1.1.1.1/dns-query',
 		],
 		'proxy-server-nameserver': [
 			'https://223.5.5.5/dns-query',
@@ -50,8 +50,8 @@ export function buildSubscriptionDNS() {
 			'1.12.12.12',
 		],
 		nameserver: [
-			'https://8.8.8.8/dns-query#disable-ipv6=true',
-			'https://1.1.1.1/dns-query#disable-ipv6=true',
+			'https://8.8.8.8/dns-query',
+			'https://1.1.1.1/dns-query',
 		],
 		'proxy-server-nameserver': [
 			'https://223.5.5.5/dns-query',

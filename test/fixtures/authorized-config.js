@@ -41,6 +41,8 @@ export function mockFeeds(fetchMock, fail = false) {
 
 export function expectAuthorizedRules(expect, config, defaultProxy) {
   expect(config.ipv6).toBe(true);
+  expect(config.dns.ipv6).toBe(true);
+  expect(config.dns.nameserver).toEqual(['https://8.8.8.8/dns-query', 'https://1.1.1.1/dns-query']);
   expect(config.rules).not.toContain('IP-CIDR6,::/0,DIRECT,no-resolve');
   expect(config.rules.some(rule => rule.startsWith('IP-CIDR6,::/0,'))).toBe(false);
   for (const cidr of ['224.0.0.0/24', '127.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '10.0.0.0/8', '100.64.0.0/10']) {

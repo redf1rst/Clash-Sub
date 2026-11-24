@@ -6,8 +6,6 @@ export function buildRules(defaultProxy) {
 		'DOMAIN-SUFFIX,linux.do,Linux DO',
 		'DOMAIN-SUFFIX,idcflare.com,Linux DO',
 		'DOMAIN-SUFFIX,anyrouter.top,DIRECT',
-		'DOMAIN-SUFFIX,elysia.h-e.top,DIRECT',
-		'DOMAIN-SUFFIX,b4u.qzz.io,DIRECT',
 		`DOMAIN-SUFFIX,leaflow.net,${defaultProxy}`,
 		`DOMAIN-SUFFIX,cloudflare.com,${defaultProxy}`,
 		`DOMAIN-SUFFIX,github.com,${defaultProxy}`,
