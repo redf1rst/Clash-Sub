@@ -82,6 +82,21 @@ sing-box 与 Quantumult X 不支持的协议会被跳过，跳过数量通过 `X
 - **Cookie认证**：基于访问令牌(Token)的Cookie认证保护,Cookie默认有效期30天
 
 
+## 项目维护与模块结构
+
+[Worker 入口](<src/index.js>) 仅负责路由、认证和静态资源分发，业务逻辑按 API、集合管理、旧版兼容、协议解析、订阅处理、配置生成及工具模块拆分。完整说明见 [模块维护文档](<ARCHITECTURE.md>)。
+
+两类集合共享 [分流规则工厂](<src/config/rules.js>) 与 [规则提供者工厂](<src/config/rule-providers.js>)，DNS 和代理组保留各自配置。规则已移除 IPv6 全直连；组播/内网 IP 规则使用 `no-resolve`，明确域名规则优先于 IP 兜底。其它 DNS、节点、代理组及客户端输出语义保持原样。
+
+```bash
+# 一次性运行本地 Workers 回归测试
+npm test -- --run
+# 只检查 Worker 打包，不发布
+npx wrangler deploy --dry-run
+```
+
+测试使用合成节点、模拟订阅和本地 KV；配置基线覆盖两类集合的多客户端输出，避免重构引入配置漂移。
+
 ## 部署步骤
 
 ### 1. 克隆项目到本地

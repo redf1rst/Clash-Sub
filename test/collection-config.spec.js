@@ -2,6 +2,7 @@ import { describe, expect, it, beforeEach } from 'vitest';
 import { env, fetchMock } from 'cloudflare:test';
 import { parse as parseYaml } from 'yaml';
 import worker from '../src/index.js';
+import { expectAuthorizedRules } from './fixtures/authorized-config.js';
 
 let collectionId = 'sub_fixture_0';
 let feedUrl = 'https://feed-0.example/subscription';
@@ -46,9 +47,8 @@ describe('flattened subscription collection config', () => {
 		expect(config['proxy-providers']).toBeUndefined();
 		expect(config.dns['default-nameserver']).toEqual(['223.5.5.5', '1.12.12.12']);
 		expect(config.rules.at(-1)).toBe('MATCH,🚀 默认代理');
-		// 开代理不影响任何 IPv6 地址：顶层开关打开 + 通配直连规则置于首行
-		expect(config.ipv6).toBe(true);
-		expect(config.rules[0]).toBe('IP-CIDR6,::/0,DIRECT,no-resolve');
+		// 保持 IPv6 可用，但不再将全部 IPv6 流量强制直连。
+		expectAuthorizedRules(expect, config, '🚀 默认代理');
 		expect(config['proxy-groups'].find(group => group.name === '🌐 全部节点')['include-all-proxies']).toBe(true);
 	});
 
