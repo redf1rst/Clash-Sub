@@ -45,21 +45,24 @@ export function expectAuthorizedRules(expect, config, defaultProxy) {
   expect(config.dns.nameserver).toEqual(['https://8.8.8.8/dns-query', 'https://1.1.1.1/dns-query']);
   expect(config.rules).not.toContain('IP-CIDR6,::/0,DIRECT,no-resolve');
   expect(config.rules.some(rule => rule.startsWith('IP-CIDR6,::/0,'))).toBe(false);
-  for (const cidr of ['224.0.0.0/24', '127.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '10.0.0.0/8', '100.64.0.0/10']) {
-    expect(config.rules).toContain(`IP-CIDR,${cidr},DIRECT,no-resolve`);
-    expect(config.rules).not.toContain(`IP-CIDR,${cidr},DIRECT`);
-  }
-  const firstResolvingIp = config.rules.indexOf('RULE-SET,CNcidr,DIRECT');
-  expect(firstResolvingIp).toBeGreaterThan(0);
-  for (const rule of ['RULE-SET,cn_domain,DIRECT', 'DOMAIN-SUFFIX,cn,DIRECT', 'DOMAIN-KEYWORD,-cn,DIRECT', ...['cdn.jsdmirror.com', 'raw.githubusercontent.com', 'cdn.jsdelivr.net', 'cdnjs.cloudflare.com', 'gstatic.com'].map(domain => `DOMAIN-SUFFIX,${domain},${defaultProxy}`)]) {
+  // This configuration update replaces the old rule lists with the supplied YAML.
+  // Private CIDRs now come from private_ip; cn_ip remains a resolving fallback.
+  expect(config.rules).toHaveLength(32);
+  expect(config.rules.slice(0, 2)).toEqual(['RULE-SET,private_domain,DIRECT', 'RULE-SET,private_ip,DIRECT,no-resolve']);
+  const firstResolvingIp = config.rules.indexOf('RULE-SET,cn_ip,DIRECT');
+  expect(firstResolvingIp).toBe(config.rules.length - 2);
+  for (const rule of ['RULE-SET,cn_domain,DIRECT', 'DOMAIN-SUFFIX,cn,DIRECT', ...['leaflow.net', 'cloudflare.com', 'cdn.jsdmirror.com', 'cdn.jsdelivr.net'].map(domain => `DOMAIN-SUFFIX,${domain},${defaultProxy}`)]) {
     const index = config.rules.indexOf(rule);
     expect(index).toBeGreaterThanOrEqual(0);
     expect(index).toBeLessThan(firstResolvingIp);
   }
-  expect(config.rules).toContain('RULE-SET,cn_ip,DIRECT');
-  expect(config.rules).toContain('IP-CIDR,17.0.0.0/8,DIRECT');
-  expect(config.rules).toContain('GEOIP,CN,DIRECT');
-  expect(config.rules.indexOf('RULE-SET,ChinaMedia,DIRECT')).toBeGreaterThan(firstResolvingIp);
-  expect(config.rules.indexOf('RULE-SET,China,DIRECT')).toBeGreaterThan(firstResolvingIp);
+  expect(config.rules).toContain('IP-CIDR,17.0.0.0/8,苹果服务,no-resolve');
+  expect(config.rules).toContain('RULE-SET,advertising_ads,REJECT');
+  for (const [provider, policy] of [['ai', 'AI服务'], ['netflix_domain', 'Netflix'], ['tiktok_domain', 'TikTok'], ['spotify_domain', 'Spotify'], ['paypal_domain', 'PayPal']]) {
+    expect(config.rules).toContain(`RULE-SET,${provider},${policy}`);
+  }
+  for (const obsolete of ['CNcidr', 'China', 'ChinaMedia']) {
+    expect(config.rules.some(rule => rule.startsWith(`RULE-SET,${obsolete},`))).toBe(false);
+  }
   expect(config.rules.at(-1)).toBe(`MATCH,${defaultProxy}`);
 }

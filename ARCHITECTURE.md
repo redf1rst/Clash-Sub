@@ -4,7 +4,7 @@
 
 项目运行于 Cloudflare Workers，使用 JavaScript ES Modules、KV、静态资源、YAML 和 Vitest。此次先修正两类集合授权范围内的 DNS 相关规则，删除 `IP-CIDR6,::/0,DIRECT,no-resolve`，再模块化。顶层 IPv6 仍开启；不引入新功能、存储迁移或部署。
 
-唯一 [Worker 入口](<src/index.js>) 由 [Wrangler 配置](<wrangler.toml>) 的 `main` 指向，入口缩减为 73 行。当前有 44 个源码模块：41 个承担原入口声明及配置工厂，另有 3 个既存外围模块。107 个原顶层声明各有唯一归属，105 个原样移动，仅两类配置生成函数改为组合工厂。
+唯一 [Worker 入口](<src/index.js>) 由 [Wrangler 配置](<wrangler.toml>) 的 `main` 指向，入口缩减为 73 行。初次模块化形成 44 个源码模块：41 个承担原入口声明及配置工厂，另有 3 个既存外围模块。107 个原顶层声明各有唯一归属，105 个原样移动，仅两类配置生成函数改为组合工厂。后续按用户最新 YAML 同步非节点策略，新增共享 [全局选项工厂](<src/config/global-options.js>)；当前为 45 个源码模块。
 
 ## 模块地图
 
@@ -19,7 +19,7 @@
 | 订阅服务 | [fetch.js](<src/subscriptions/fetch.js>)：安全拉取；[info.js](<src/subscriptions/info.js>)：头信息、拒绝策略、名称；[health.js](<src/subscriptions/health.js>)：检测；[cache.js](<src/subscriptions/cache.js>)：来源快照及内联节点 |
 | 解析入口 | [proxy-url.js](<src/parsers/proxy-url.js>)：URI 分派；[json.js](<src/parsers/json.js>)：JSON 导入规范化；[helpers.js](<src/parsers/helpers.js>)：Base64、SMUX、Brutal、宽松 JSON |
 | 配置编排 | [proxy-collection.js](<src/config/proxy-collection.js>)、[subscription-collection.js](<src/config/subscription-collection.js>)：读取、排序/刷新、工厂和响应 |
-| 配置工厂 | [dns.js](<src/config/dns.js>)、[proxy-groups.js](<src/config/proxy-groups.js>)、[subscription-groups.js](<src/config/subscription-groups.js>)、[rules.js](<src/config/rules.js>)、[rule-providers.js](<src/config/rule-providers.js>) |
+| 配置工厂 | [global-options.js](<src/config/global-options.js>)、[dns.js](<src/config/dns.js>)、[proxy-groups.js](<src/config/proxy-groups.js>)、[subscription-groups.js](<src/config/subscription-groups.js>)、[rules.js](<src/config/rules.js>)、[rule-providers.js](<src/config/rule-providers.js>) |
 | 工具 | [regions.js](<src/utils/regions.js>)：地区识别/排序；[address.js](<src/utils/address.js>)：地址格式；[proxy-identity.js](<src/utils/proxy-identity.js>)：节点比较；[yaml.js](<src/utils/yaml.js>)：Clash YAML |
 | 既存外围 | [token-auth.js](<src/token-auth.js>)：双 Cookie；[subscription-parser.js](<src/subscription-parser.js>)：来源解码；[client-formats.js](<src/client-formats.js>)：客户端输出 |
 | 页面 | [index.html](<public/index.html>)、[auth.html](<public/auth.html>)：管理与验证，不改变体验和请求形状 |
@@ -87,11 +87,11 @@ URL/名称按索引对齐；`enablePrefix !== false` 默认开启。集合 ID、
 
 ## 配置与序列化
 
-- [规则](<src/config/rules.js>)、[提供者](<src/config/rule-providers.js>) 两类共享，仅默认策略名为 `节点选择`、`🚀 默认代理`。
-- [DNS](<src/config/dns.js>) 保留两套及订阅集合 `+.yfjc.xyz` 差异；组各自维护。
+- 两类集合按最新源配置共享 [全局选项](<src/config/global-options.js>)、[DNS](<src/config/dns.js>)、23 个 [代理组](<src/config/subscription-groups.js>)、32 条 [规则](<src/config/rules.js>) 和 19 个 [提供者](<src/config/rule-providers.js>)，默认策略统一为 `🚀 默认代理`。[节点组工厂](<src/config/proxy-groups.js>) 委托共享组工厂；具体节点仍由集合和订阅动态提供。
 - 工厂每次返回新对象/数组，健康检查与 `include-all` 转换就地修改组，不能跨请求共享可变单例。
-- 属性/规则/节点顺序、DNS、策略名、来源 URL、附件名、响应头均为兼容边界。
-- 明确域名规则先于需解析 IP 兜底，组播/内网 IP 使用 `no-resolve`，保留 `CNcidr/cn_ip/GEOIP,CN` 解析兜底，不加回 `::/0` 全直连。
+- 授权策略同步之外，属性/规则/节点顺序、DNS、策略名、来源 URL、附件名、响应头均为兼容边界。源配置 fixture 仅保留非节点字段，不含真实节点或凭据。
+- 保留源规则顺序、`+.yfjc.xyz` DNS 策略及指定的 `no-resolve`；末尾为 `RULE-SET,cn_ip,DIRECT` 和默认代理兜底。不恢复旧 `CNcidr/GEOIP,CN` 策略或 `::/0` 全直连。
+- Stash/Shadowrocket 过滤转换后不存在的 DNS 提供者引用，广告别名降级为 `category-ads-all`；各格式的既有转换无法保证完整复制 Mihomo 策略。
 - Clash 的 [convertToYAML](<src/utils/yaml.js>) 使用 YAML 库与 `defaultStringType: 'QUOTE_DOUBLE'`；其它 YAML target 使用 [客户端渲染器](<src/client-formats.js>) 的独立参数。两者都不是手工 YAML，但引号/封装不同，不为统一而改变结果。
 
 ## 保留的行为风险
@@ -105,16 +105,16 @@ URL/名称按索引对齐；`enablePrefix !== false` 默认开启。集合 ID、
 6. [认证](<src/token-auth.js>) 保持订阅前缀白名单、API 401 JSON、页面 302 路径/查询、双 Cookie、SameSite=Lax、HTTPS Secure、双 `Set-Cookie` append。标记不含令牌，认证先于 ASSETS，清令牌路由位置不变。
 7. 返回文本/降级与注释不一致时以实现/基线为准，不按旧 HEAD 注释重写检测。
 
-## 本次验证与日常维护
+## 验证记录与日常维护
 
-独立审阅者只读核对实际模块、imports/exports、入口和前端实参，未发现重构阻断项。以下机器验证由 Lead 本地执行，测试仅使用合成数据或 mock，不访问真实订阅，不部署：
+初次模块化时，独立审阅者只读核对实际模块、imports/exports、入口和前端实参，未发现重构阻断项。以下为该阶段的历史验证记录，测试仅使用合成数据或 mock，不访问真实订阅，不部署：
 - 107 个原声明唯一保留，105 个逐字一致；44 个模块语法、相对 exports 可解析，无循环。
 - 37 组授权后响应正文长度/SHA256、status、全部 headers 新旧一致。
 - 60 次 API/认证/静态路由响应及每次 KV 变更对比一致。
 - 最终 Workers 测试：6 个测试文件、90 个测试全部通过；Windows 临时目录清理有非致命 EBUSY 警告，退出码为 0。
 - Wrangler dry-run 打包成功，未发布。前端、认证、既存格式/解码模块、依赖和部署设置未修改。
 
-冻结基线见 [测试说明](<test/fixtures/BASELINE.md>)、[响应基线](<test/fixtures/authorized-config-baseline.json>)、[回归测试](<test/config-baseline.spec.js>)。不要自动更新基线以使重构通过。
+2026-11-27 最新配置同步补充了 [源策略与转换回归](<test/latest-config.spec.js>)。源配置与工厂逐字段深等，37 组响应独立推导后与实现逐字节核验：24 组正文变化、13 组不变，全部状态码与响应头不变。完整 Workers 测试及 Wrangler dry-run 均退出码 0；没有部署、操作生产 KV 或请求真实订阅。旧基线在本次修改前已有的两条域名规则差异及更新过程，详见 [测试说明](<test/fixtures/BASELINE.md>)、[响应基线](<test/fixtures/authorized-config-baseline.json>)、[回归测试](<test/config-baseline.spec.js>)。不要自动更新基线以使测试通过。
 
 ```bash
 npm test -- --run

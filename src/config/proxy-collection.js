@@ -3,6 +3,7 @@ import { getProxyCollections } from '../collections/proxies.js';
 import { sortProxiesByRegion } from '../utils/regions.js';
 import { convertToYAML } from '../utils/yaml.js';
 import { buildProxyDNS } from './dns.js';
+import { buildGlobalOptions } from './global-options.js';
 import { buildProxyGroups } from './proxy-groups.js';
 import { buildRuleProviders } from './rule-providers.js';
 import { buildRules } from './rules.js';
@@ -27,12 +28,12 @@ async function generateProxyCollectionConfig(collectionId, env, target, part, tu
 		sortProxiesByRegion(proxies);
 
 		const config = {
-			ipv6: true,
+			...buildGlobalOptions(),
 			dns: buildProxyDNS(),
 			proxies: proxies,
-			'proxy-groups': buildProxyGroups(proxies),
-			'rule-providers': buildRuleProviders('节点选择'),
-			rules: buildRules('节点选择')
+			'proxy-groups': buildProxyGroups(),
+			'rule-providers': buildRuleProviders('🚀 默认代理'),
+			rules: buildRules('🚀 默认代理')
 		};
 
 		withGroupHealthCheck(config['proxy-groups']);

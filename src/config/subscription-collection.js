@@ -3,6 +3,7 @@ import { getSubCollections } from '../collections/subscriptions.js';
 import { generateSimpleProviderName, MAX_INLINE_PROXIES, refreshSubscriptionProxies } from '../subscriptions/cache.js';
 import { convertToYAML } from '../utils/yaml.js';
 import { buildSubscriptionDNS } from './dns.js';
+import { buildGlobalOptions } from './global-options.js';
 import { buildRuleProviders } from './rule-providers.js';
 import { buildRules } from './rules.js';
 import { buildSubscriptionGroups } from './subscription-groups.js';
@@ -54,79 +55,8 @@ async function generateSubCollectionConfig(collectionId, env, target, part, tun,
 
 		const sortedSubscriptions = subscriptionPairs.map(pair => pair.url);
 
-		// 根据 submerge-config.yaml 格式构建配置
-		// 顶层 ipv6 开关。缺省为关时 mihomo 会直接判定「不支持 IPv6」并拒绝
-		// 建立 IPv6 出站连接，此时哪怕规则判了 DIRECT 也连不出去。
-		const config = {
-			ipv6: true
-		};
-
-		// 全局规则
-		// config.port = 7890;
-		// config['socks-port'] = 7891;
-		// config['redir-port'] = 7892;
-		// config['mixed-port'] = 7897;
-		// config['tproxy-port'] = 7894;
-		// config['allow-lan'] = true;
-		// config['bind-address'] = '*';
-		// config['unified-delay'] = true;
-		// config['tcp-concurrent'] = true;
-		// config['log-level'] = 'info';
-		// config['find-process-mode'] = 'off';
-		// config['global-client-fingerprint'] = 'chrome';
-		// config['keep-alive-idle'] = 600;
-		// config['keep-alive-interval'] = 15;
-		// config['disable-keep-alive'] = false;
-		// config.profile = {
-		// 	'store-selected': true,
-		// 	'store-fake-ip': true
-		// };
-		// config.mode = 'rule';
-		// config['geodata-mode'] = false;
-		// config['geodata-loader'] = 'standard';
-		// config['geo-auto-update'] = true;
-		// config['geo-update-interval'] = 24;
-
-		// 嗅探配置
-		// config.sniffer = {
-		// 	enable: true,
-		// 	'force-dns-mapping': true,
-		// 	'parse-pure-ip': true,
-		// 	'override-destination': true,
-		// 	sniff: {
-		// 		HTTP: {
-		// 			ports: [80, '8080-8880'],
-		// 			'override-destination': true
-		// 		},
-		// 		TLS: {
-		// 			ports: [443, 8443]
-		// 		},
-		// 		QUIC: {
-		// 			ports: [443, 8443]
-		// 		}
-		// 	},
-		// 	'force-domain': ['+.v2ex.com'],
-		// 	'skip-domain': ['+.baidu.com', 'Mijia.Cloud.com'],
-		// 	'skip-src-address': ['192.168.0.3/32'],
-		// 	'skip-dst-address': ['192.168.0.3/32']
-		// };
-
-		// 入站配置
-		// config.tun = {
-		// 	enable: true,
-		// 	stack: 'mixed',
-		// 	'dns-hijack': ['any:53', 'tcp://any:53'],
-		// 	'auto-route': true,
-		// 	'auto-redirect': true,
-		// 	'auto-detect-interface': true,
-		// 	device: 'utun0',
-		// 	mtu: 1500,
-		// 	'strict-route': true,
-		// 	gso: true,
-		// 	'gso-max-size': 65536,
-		// 	'udp-timeout': 300,
-		// 	'endpoint-independent-nat': false
-		// };
+		// 与节点集合共享最新全局策略；具体节点仍由订阅刷新生成。
+		const config = buildGlobalOptions();
 
 		// DNS模块
 		config.dns = buildSubscriptionDNS();

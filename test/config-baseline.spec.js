@@ -5,8 +5,8 @@ import worker from '../src/index.js';
 import baseline from './fixtures/authorized-config-baseline.json';
 import { collectionId, configUrl, expectAuthorizedRules, makeEnv, mockFeeds, variants } from './fixtures/authorized-config.js';
 
-// Fixed expectations originate from the authorized, still-monolithic Worker.
-// DNS suffix removal was derived from verified old bodies; see fixtures/BASELINE.md.
+// Fixed bodies derive from the sanitized source YAML and pre-update synthetic nodes.
+// Status/headers and errors retain the prior baseline; see fixtures/BASELINE.md.
 // Never regenerate this fixture from current output to hide a regression.
 async function responseFingerprint(response) {
   const body = await response.arrayBuffer();
@@ -26,7 +26,7 @@ async function assertBaseline(label, url, env) {
 const formatCases = ['proxies', 'submerge'].flatMap(kind => variants.map(([query, label]) => [kind, query, `${kind}/${label}`, true]));
 formatCases.push(...variants.slice(0, 8).map(([query, label]) => ['submerge', query, `submerge/no-prefix/${label}`, false]));
 
-describe('authorized pre-modularization collection response baselines', () => {
+describe('authorized source configuration response baselines', () => {
   beforeEach(() => {
     fetchMock.activate();
     fetchMock.disableNetConnect();
@@ -37,13 +37,13 @@ describe('authorized pre-modularization collection response baselines', () => {
     expect(new Set(formatCases.map(([, , label]) => label)).size).toBe(30);
   });
 
-  it.each(formatCases)('%s %s matches original body bytes, SHA256, status and all headers (%s)', async (kind, query, label, prefix) => {
+  it.each(formatCases)('%s %s matches reviewed body bytes, SHA256, status and all headers (%s)', async (kind, query, label, prefix) => {
     if (kind === 'submerge') mockFeeds(fetchMock);
     await assertBaseline(label, configUrl(kind, query), makeEnv(prefix));
     fetchMock.assertNoPendingInterceptors();
   });
 
-  it('keeps fresh-source, cached-fallback and uncached-failure responses unchanged', async () => {
+  it('checks updated cached bodies and unchanged failure responses', async () => {
     const env = makeEnv();
     mockFeeds(fetchMock);
     await assertBaseline('submerge/cache/refresh', configUrl('submerge'), env);
@@ -66,7 +66,7 @@ describe('authorized pre-modularization collection response baselines', () => {
   it.each(['proxies', 'submerge'])('%s explicitly preserves the authorized rule changes', async kind => {
     if (kind === 'submerge') mockFeeds(fetchMock);
     const response = await worker.fetch(new Request(configUrl(kind)), makeEnv(), {});
-    expectAuthorizedRules(expect, parseYaml(await response.text()), kind === 'proxies' ? '节点选择' : '🚀 默认代理');
+    expectAuthorizedRules(expect, parseYaml(await response.text()), '🚀 默认代理');
     fetchMock.assertNoPendingInterceptors();
   });
 

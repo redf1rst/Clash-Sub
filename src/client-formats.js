@@ -10,6 +10,7 @@ const SUPPORTED_TARGETS = new Set(['clash', 'stash', 'shadowrocket', 'singbox', 
 const PROVIDER_SUBSTITUTES = {
 	CNcidr: { geosite: null, geoip: 'cn' },
 	'Advertising-ads': { geosite: 'category-ads-all', geoip: null },
+	advertising_ads: { geosite: 'category-ads-all', geoip: null },
 	China: { geosite: 'cn', geoip: null },
 	ChinaMedia: { geosite: 'cn', geoip: null },
 	LAN: null
@@ -141,7 +142,7 @@ function substituteForStash(key, substitute, provider) {
 }
 
 // Stash 的 DNS 只保留其文档明确支持的字段：nameserver-policy 的值必须是字符串。
-function dnsForStash(dns) {
+function dnsForStash(dns, providers) {
 	if (!isObject(dns)) return undefined;
 	const policy = {};
 	if (isObject(dns['nameserver-policy'])) {
@@ -156,7 +157,10 @@ function dnsForStash(dns) {
 		'proxy-server-nameserver': dns['proxy-server-nameserver'],
 		'enhanced-mode': dns['enhanced-mode'],
 		'fake-ip-range': dns['fake-ip-range'],
-		'fake-ip-filter': dns['fake-ip-filter'],
+		// Do not leave DNS references to providers dropped by this conversion.
+		'fake-ip-filter': Array.isArray(dns['fake-ip-filter'])
+			? dns['fake-ip-filter'].filter(value => typeof value !== 'string' || !value.startsWith('rule-set:') || Boolean(providers[value.slice(9)]))
+			: dns['fake-ip-filter'],
 		ipv6: dns.ipv6,
 		'nameserver-policy': Object.keys(policy).length ? policy : undefined
 	});
@@ -178,7 +182,7 @@ export function toStashConfig(config) {
 
 	return compact({
 		mode: config.mode || 'rule',
-		dns: dnsForStash(config.dns),
+		dns: dnsForStash(config.dns, providers),
 		proxies: proxies.filter(proxy => !isJunkProxy(proxy)).map(stripMihomoOnlyFields),
 		'proxy-groups': (config['proxy-groups'] || []).map(groupForStash),
 		'rule-providers': Object.keys(providers).length ? providers : undefined,

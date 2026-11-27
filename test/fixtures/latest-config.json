@@ -1,0 +1,559 @@
+{
+  "ipv6": true,
+  "unified-delay": true,
+  "tcp-concurrent": true,
+  "find-process-mode": "strict",
+  "profile": {
+    "store-selected": true,
+    "store-fake-ip": true
+  },
+  "sniffer": {
+    "enable": true,
+    "force-dns-mapping": true,
+    "parse-pure-ip": true,
+    "override-destination": false,
+    "sniff": {
+      "HTTP": {
+        "ports": [
+          80,
+          "8080-8880"
+        ],
+        "override-destination": true
+      },
+      "TLS": {
+        "ports": [
+          443,
+          8443
+        ]
+      },
+      "QUIC": {
+        "ports": [
+          443,
+          8443
+        ]
+      }
+    },
+    "skip-domain": [
+      "Mijia Cloud",
+      "+.push.apple.com"
+    ]
+  },
+  "dns": {
+    "enable": true,
+    "listen": "[::]:1053",
+    "ipv6": true,
+    "respect-rules": true,
+    "enhanced-mode": "fake-ip",
+    "fake-ip-range": "198.18.0.1/16",
+    "fake-ip-filter": [
+      "*.lan",
+      "*.local",
+      "rule-set:private_domain",
+      "rule-set:fakeip_filter",
+      "rule-set:stun_domain"
+    ],
+    "default-nameserver": [
+      "223.5.5.5",
+      "1.12.12.12"
+    ],
+    "nameserver": [
+      "https://8.8.8.8/dns-query",
+      "https://1.1.1.1/dns-query"
+    ],
+    "direct-nameserver": [
+      "https://223.5.5.5/dns-query",
+      "https://1.12.12.12/dns-query"
+    ],
+    "proxy-server-nameserver": [
+      "https://223.5.5.5/dns-query",
+      "https://1.12.12.12/dns-query"
+    ],
+    "nameserver-policy": {
+      "rule-set:private_domain": [
+        "system"
+      ],
+      "rule-set:cn_domain": [
+        "https://223.5.5.5/dns-query",
+        "https://1.12.12.12/dns-query"
+      ],
+      "+.yfjc.xyz": [
+        "https://223.5.5.5/dns-query",
+        "https://1.12.12.12/dns-query"
+      ]
+    }
+  },
+  "proxy-groups": [
+    {
+      "name": "🚀 默认代理",
+      "type": "select",
+      "proxies": [
+        "自动选择",
+        "🌐 全部节点",
+        "♻️ 香港自动",
+        "♻️ 台湾自动",
+        "♻️ 日本自动",
+        "♻️ 新加坡自动",
+        "♻️ 韩国自动",
+        "♻️ 美国自动",
+        "🇭🇰 香港节点",
+        "🇨🇳 台湾节点",
+        "🇯🇵 日本节点",
+        "🇸🇬 新加坡节点",
+        "🇰🇷 韩国节点",
+        "🇺🇲 美国节点",
+        "DIRECT"
+      ],
+      "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png"
+    },
+    {
+      "name": "🌐 全部节点",
+      "type": "select",
+      "exclude-filter": "(?i)(10x|6x|过滤|客户端|不要|付款|如果|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|地址|频道|无法|说明|提示|特别|访问|教程|关注|更新|建议|作者|加入|\\b(USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author)\\b|\\d{4}-\\d{2}-\\d{2}|\\d+G)",
+      "include-all-proxies": true
+    },
+    {
+      "name": "AI服务",
+      "type": "select",
+      "proxies": [
+        "♻️ 美国自动",
+        "♻️ 日本自动",
+        "♻️ 新加坡自动",
+        "♻️ 台湾自动",
+        "♻️ 韩国自动",
+        "🇺🇲 美国节点",
+        "🇯🇵 日本节点",
+        "🇸🇬 新加坡节点",
+        "🇨🇳 台湾节点",
+        "🇰🇷 韩国节点",
+        "🌐 全部节点",
+        "🚀 默认代理",
+        "DIRECT"
+      ],
+      "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png"
+    },
+    {
+      "name": "Netflix",
+      "type": "select",
+      "proxies": [
+        "♻️ 新加坡自动",
+        "♻️ 台湾自动",
+        "♻️ 日本自动",
+        "♻️ 美国自动",
+        "♻️ 香港自动",
+        "♻️ 韩国自动",
+        "🇸🇬 新加坡节点",
+        "🇨🇳 台湾节点",
+        "🇯🇵 日本节点",
+        "🇺🇲 美国节点",
+        "🇭🇰 香港节点",
+        "🇰🇷 韩国节点",
+        "🚀 默认代理",
+        "🌐 全部节点"
+      ],
+      "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png"
+    },
+    {
+      "name": "TikTok",
+      "type": "select",
+      "proxies": [
+        "♻️ 日本自动",
+        "♻️ 新加坡自动",
+        "♻️ 台湾自动",
+        "♻️ 美国自动",
+        "♻️ 韩国自动",
+        "🇯🇵 日本节点",
+        "🇸🇬 新加坡节点",
+        "🇨🇳 台湾节点",
+        "🇺🇲 美国节点",
+        "🇰🇷 韩国节点",
+        "🚀 默认代理",
+        "🌐 全部节点"
+      ],
+      "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/TikTok.png"
+    },
+    {
+      "name": "Spotify",
+      "type": "select",
+      "proxies": [
+        "🚀 默认代理",
+        "♻️ 新加坡自动",
+        "♻️ 日本自动",
+        "♻️ 美国自动",
+        "♻️ 香港自动",
+        "♻️ 台湾自动",
+        "🇸🇬 新加坡节点",
+        "🇯🇵 日本节点",
+        "🇺🇲 美国节点",
+        "🇭🇰 香港节点",
+        "🇨🇳 台湾节点",
+        "🌐 全部节点",
+        "DIRECT"
+      ],
+      "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png"
+    },
+    {
+      "name": "PayPal",
+      "type": "select",
+      "proxies": [
+        "🇺🇲 美国节点",
+        "🇭🇰 香港节点",
+        "🇯🇵 日本节点",
+        "🇸🇬 新加坡节点",
+        "🇨🇳 台湾节点",
+        "🇰🇷 韩国节点",
+        "🚀 默认代理",
+        "🌐 全部节点",
+        "DIRECT"
+      ],
+      "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/PayPal.png"
+    },
+    {
+      "name": "Linux DO",
+      "icon": "https://github.com/redf1rst/clash-sub/blob/main/img/linux-do.png?raw=true",
+      "type": "select",
+      "proxies": [
+        "🚀 默认代理",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "微软服务",
+      "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Microsoft.png",
+      "type": "select",
+      "proxies": [
+        "DIRECT",
+        "🚀 默认代理",
+        "AI服务"
+      ]
+    },
+    {
+      "name": "苹果服务",
+      "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png",
+      "type": "select",
+      "proxies": [
+        "DIRECT",
+        "🚀 默认代理"
+      ]
+    },
+    {
+      "name": "自动选择",
+      "type": "url-test",
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": 300,
+      "tolerance": 80,
+      "lazy": true,
+      "include-all-proxies": true,
+      "icon": "https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/Auto.png",
+      "exclude-filter": "(?i)(10x|6x|过滤|客户端|不要|付款|如果|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|地址|频道|无法|说明|提示|特别|访问|教程|关注|更新|建议|作者|加入|\\b(USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author)\\b|\\d{4}-\\d{2}-\\d{2}|\\d+G)"
+    },
+    {
+      "name": "♻️ 香港自动",
+      "type": "url-test",
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": 300,
+      "tolerance": 80,
+      "lazy": true,
+      "include-all-proxies": true,
+      "icon": "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/hk.svg",
+      "filter": "(?i)^(?!.*(10x|6x)).*(🇭🇰|香港|九龙|新界|(?<![a-z])(HK|Hong ?Kong)(?![a-z]))"
+    },
+    {
+      "name": "♻️ 台湾自动",
+      "type": "url-test",
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": 300,
+      "tolerance": 80,
+      "lazy": true,
+      "include-all-proxies": true,
+      "icon": "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/cn.svg",
+      "filter": "(?i)^(?!.*(10x|6x)).*(🇹🇼|台湾|台灣|台北|新北|高雄|(?<![a-z])(TW|Tai ?wan)(?![a-z]))"
+    },
+    {
+      "name": "♻️ 日本自动",
+      "type": "url-test",
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": 300,
+      "tolerance": 80,
+      "lazy": true,
+      "include-all-proxies": true,
+      "icon": "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/jp.svg",
+      "filter": "(?i)^(?!.*(10x|6x)).*(🇯🇵|日本|东京|東京|大阪|京都|名古屋|埼玉|(?<![a-z])(JP|Japan)(?![a-z]))"
+    },
+    {
+      "name": "♻️ 新加坡自动",
+      "type": "url-test",
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": 300,
+      "tolerance": 80,
+      "lazy": true,
+      "include-all-proxies": true,
+      "icon": "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/sg.svg",
+      "filter": "(?i)^(?!.*(10x|6x)).*(🇸🇬|新加坡|狮城|(?<![a-z])(SG|Singapore)(?![a-z]))"
+    },
+    {
+      "name": "♻️ 韩国自动",
+      "type": "url-test",
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": 300,
+      "tolerance": 80,
+      "lazy": true,
+      "include-all-proxies": true,
+      "icon": "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/kr.svg",
+      "filter": "(?i)^(?!.*(10x|6x)).*(🇰🇷|韩国|韓國|首尔|首爾|釜山|(?<![a-z])(KR|Korea)(?![a-z]))"
+    },
+    {
+      "name": "♻️ 美国自动",
+      "type": "url-test",
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": 300,
+      "tolerance": 80,
+      "lazy": true,
+      "include-all-proxies": true,
+      "icon": "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/us.svg",
+      "filter": "(?i)^(?!.*(10x|6x)).*(🇺🇸|🇺🇲|美国|美國|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|(?<![a-z])(US|United States|America)(?![a-z]))"
+    },
+    {
+      "name": "🇭🇰 香港节点",
+      "type": "select",
+      "include-all-proxies": true,
+      "filter": "(?i)^(?!.*(10x|6x)).*(🇭🇰|香港|九龙|新界|(?<![a-z])(HK|Hong ?Kong)(?![a-z]))"
+    },
+    {
+      "name": "🇨🇳 台湾节点",
+      "type": "select",
+      "include-all-proxies": true,
+      "filter": "(?i)^(?!.*(10x|6x)).*(🇹🇼|台湾|台灣|台北|新北|高雄|(?<![a-z])(TW|Tai ?wan)(?![a-z]))"
+    },
+    {
+      "name": "🇯🇵 日本节点",
+      "type": "select",
+      "include-all-proxies": true,
+      "filter": "(?i)^(?!.*(10x|6x)).*(🇯🇵|日本|东京|東京|大阪|京都|名古屋|埼玉|(?<![a-z])(JP|Japan)(?![a-z]))"
+    },
+    {
+      "name": "🇸🇬 新加坡节点",
+      "type": "select",
+      "include-all-proxies": true,
+      "filter": "(?i)^(?!.*(10x|6x)).*(🇸🇬|新加坡|狮城|(?<![a-z])(SG|Singapore)(?![a-z]))"
+    },
+    {
+      "name": "🇰🇷 韩国节点",
+      "type": "select",
+      "include-all-proxies": true,
+      "filter": "(?i)^(?!.*(10x|6x)).*(🇰🇷|韩国|韓國|首尔|首爾|釜山|(?<![a-z])(KR|Korea)(?![a-z]))"
+    },
+    {
+      "name": "🇺🇲 美国节点",
+      "type": "select",
+      "include-all-proxies": true,
+      "filter": "(?i)^(?!.*(10x|6x)).*(🇺🇸|🇺🇲|美国|美國|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|(?<![a-z])(US|United States|America)(?![a-z]))"
+    }
+  ],
+  "rule-providers": {
+    "private_domain": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs",
+      "path": "./ruleset/private_domain.mrs"
+    },
+    "private_ip": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "ipcidr",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs",
+      "path": "./ruleset/private_ip.mrs"
+    },
+    "fakeip_filter": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/mihomo-ruleset/fakeip-filter.mrs",
+      "path": "./ruleset/fakeip_filter.mrs"
+    },
+    "stun_domain": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/Kwisma/rules/main/rules/mihomo/STUN/STUN_Domain.mrs",
+      "path": "./ruleset/stun_domain.mrs"
+    },
+    "advertising_ads": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.mrs",
+      "path": "./ruleset/advertising_ads.mrs"
+    },
+    "ai": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-!cn.mrs",
+      "path": "./ruleset/ai.mrs"
+    },
+    "netflix_domain": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs",
+      "path": "./ruleset/netflix_domain.mrs"
+    },
+    "netflix_ip": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "ipcidr",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs",
+      "path": "./ruleset/netflix_ip.mrs"
+    },
+    "tiktok_domain": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs",
+      "path": "./ruleset/tiktok_domain.mrs"
+    },
+    "spotify_domain": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.mrs",
+      "path": "./ruleset/spotify_domain.mrs"
+    },
+    "paypal_domain": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/paypal.mrs",
+      "path": "./ruleset/paypal_domain.mrs"
+    },
+    "microsoft_domain": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.mrs",
+      "path": "./ruleset/microsoft_domain.mrs"
+    },
+    "apple_cn_domain": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple-cn.mrs",
+      "path": "./ruleset/apple_cn_domain.mrs"
+    },
+    "gfw_domain": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/gfw.mrs",
+      "path": "./ruleset/gfw_domain.mrs"
+    },
+    "geolocation-!cn": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs",
+      "path": "./ruleset/geolocation-!cn.mrs"
+    },
+    "cn_domain": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "domain",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs",
+      "path": "./ruleset/cn_domain.mrs"
+    },
+    "cn_ip": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "ipcidr",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs",
+      "path": "./ruleset/cn_ip.mrs"
+    },
+    "google_ip": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "ipcidr",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs",
+      "path": "./ruleset/google_ip.mrs"
+    },
+    "telegram_ip": {
+      "type": "http",
+      "interval": 86400,
+      "behavior": "ipcidr",
+      "format": "mrs",
+      "proxy": "🚀 默认代理",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs",
+      "path": "./ruleset/telegram_ip.mrs"
+    }
+  },
+  "rules": [
+    "RULE-SET,private_domain,DIRECT",
+    "RULE-SET,private_ip,DIRECT,no-resolve",
+    "DOMAIN-SUFFIX,yfjc.xyz,DIRECT",
+    "DOMAIN-SUFFIX,anyrouter.top,DIRECT",
+    "DOMAIN-SUFFIX,cdn.bcebos.com,DIRECT",
+    "DOMAIN-SUFFIX,linux.do,Linux DO",
+    "DOMAIN-SUFFIX,idcflare.com,Linux DO",
+    "DOMAIN-SUFFIX,leaflow.net,🚀 默认代理",
+    "DOMAIN-SUFFIX,cloudflare.com,🚀 默认代理",
+    "DOMAIN-SUFFIX,cdn.jsdmirror.com,🚀 默认代理",
+    "DOMAIN-SUFFIX,cdn.jsdelivr.net,🚀 默认代理",
+    "DOMAIN-SUFFIX,adobe.io,REJECT",
+    "DOMAIN-SUFFIX,adobestats.io,REJECT",
+    "RULE-SET,advertising_ads,REJECT",
+    "RULE-SET,ai,AI服务",
+    "DOMAIN-SUFFIX,codebuddy.ai,AI服务",
+    "RULE-SET,netflix_domain,Netflix",
+    "RULE-SET,tiktok_domain,TikTok",
+    "RULE-SET,spotify_domain,Spotify",
+    "RULE-SET,paypal_domain,PayPal",
+    "RULE-SET,microsoft_domain,微软服务",
+    "RULE-SET,apple_cn_domain,苹果服务",
+    "RULE-SET,gfw_domain,🚀 默认代理",
+    "RULE-SET,geolocation-!cn,🚀 默认代理",
+    "RULE-SET,cn_domain,DIRECT",
+    "DOMAIN-SUFFIX,cn,DIRECT",
+    "RULE-SET,netflix_ip,Netflix,no-resolve",
+    "RULE-SET,telegram_ip,🚀 默认代理,no-resolve",
+    "RULE-SET,google_ip,🚀 默认代理,no-resolve",
+    "IP-CIDR,17.0.0.0/8,苹果服务,no-resolve",
+    "RULE-SET,cn_ip,DIRECT",
+    "MATCH,🚀 默认代理"
+  ]
+}
