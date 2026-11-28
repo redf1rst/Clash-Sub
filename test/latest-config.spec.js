@@ -52,7 +52,7 @@ describe('latest configuration factories', () => {
 
     expect(Object.keys(providers)).toHaveLength(19);
     expect(groups).toHaveLength(23);
-    expect(rules).toHaveLength(32);
+    expect(rules).toHaveLength(40);
     for (const rule of rules) {
       const match = rule.match(/^RULE-SET,([^,]+),/);
       if (match) expect(providers).toHaveProperty(match[1]);
@@ -71,15 +71,56 @@ describe('latest configuration factories', () => {
     for (const providerName of dnsRefs) expect(providers).toHaveProperty(providerName);
 
     expect(groups[0].name).toBe('🚀 默认代理');
-    expect(groups[0].proxies[0]).toBe('自动选择');
-    expect(groups[0].proxies.at(-1)).toBe('DIRECT');
+    expect(groups[0].proxies).toEqual([
+      '♻️ 自动选择', '🌐 全部节点',
+      '♻️ 美国自动', '♻️ 日本自动', '♻️ 新加坡自动', '♻️ 台湾自动', '♻️ 香港自动', '♻️ 韩国自动',
+      '🇺🇲 美国节点', '🇯🇵 日本节点', '🇸🇬 新加坡节点', '🇨🇳 台湾节点', '🇭🇰 香港节点', '🇰🇷 韩国节点',
+      'DIRECT'
+    ]);
+    const manualNames = ['🇺🇲 美国节点', '🇯🇵 日本节点', '🇸🇬 新加坡节点', '🇨🇳 台湾节点', '🇭🇰 香港节点', '🇰🇷 韩国节点'];
+    const automaticIndex = groups.findIndex(group => group.name === '♻️ 自动选择');
+    expect(groups.slice(automaticIndex - manualNames.length, automaticIndex).map(group => group.name)).toEqual(manualNames);
+    expect(automaticIndex).toBe(16);
+    expect(groups.findIndex(group => group.name === 'Linux DO')).toBeLessThan(groups.findIndex(group => group.name === 'Netflix'));
+    const group = name => groups.find(item => item.name === name);
+    expect(group('♻️ 自动选择')).toMatchObject({
+      type: 'url-test',
+      url: 'https://www.gstatic.com/generate_204',
+      interval: 300,
+      tolerance: 80,
+      lazy: true,
+      'include-all-proxies': true
+    });
+    expect(group('♻️ 自动选择')['exclude-filter']).toContain('10x|6x');
+    expect(group('Linux DO').proxies).toEqual(['🚀 默认代理', ...manualNames, '🌐 全部节点', 'DIRECT']);
+    expect(group('微软服务').proxies.slice(-7)).toEqual([...manualNames, '🌐 全部节点']);
+    expect(group('苹果服务').proxies.slice(-7)).toEqual([...manualNames, '🌐 全部节点']);
+    expect(Object.values(providers).every(provider => provider.proxy === '♻️ 自动选择')).toBe(true);
     expect(buildRules('节点选择').at(-1)).toBe('MATCH,节点选择');
-    expect(buildRuleProviders('节点选择').private_domain.proxy).toBe('节点选择');
+    expect(Object.values(buildRuleProviders('节点选择')).every(provider => provider.proxy === '♻️ 自动选择')).toBe(true);
+    expect(providers['geolocation-!cn']).toMatchObject({
+      type: 'http', behavior: 'domain', format: 'mrs',
+      url: 'https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs',
+      path: './ruleset/geolocation-!cn.mrs'
+    });
   });
 
   it('preserves the fixture rule sequence, including domain-before-IP fallback order', () => {
     expect(buildRules()).toEqual(latestConfig.rules);
-    expect(buildRules()).toHaveLength(32);
+    expect(buildRules()).toHaveLength(40);
+    const githubRules = buildRules().filter(rule => rule.includes('github'));
+    expect(githubRules).toEqual([
+      'DOMAIN-SUFFIX,github.com,🚀 默认代理',
+      'DOMAIN-SUFFIX,githubusercontent.com,🚀 默认代理',
+      'DOMAIN-SUFFIX,githubassets.com,🚀 默认代理',
+      'DOMAIN-SUFFIX,githubapp.com,🚀 默认代理',
+      'DOMAIN-SUFFIX,github.dev,🚀 默认代理',
+      'DOMAIN-SUFFIX,github.io,🚀 默认代理',
+      'DOMAIN-SUFFIX,github.blog,🚀 默认代理',
+      'DOMAIN-SUFFIX,githubstatus.com,🚀 默认代理'
+    ]);
+    expect(buildRules().indexOf('DOMAIN-SUFFIX,github.com,🚀 默认代理'))
+      .toBeLessThan(buildRules().indexOf('RULE-SET,cn_domain,DIRECT'));
     expect(buildRules().slice(0, 3)).toEqual([
       'RULE-SET,private_domain,DIRECT',
       'RULE-SET,private_ip,DIRECT,no-resolve',

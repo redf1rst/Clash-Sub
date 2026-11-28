@@ -32,7 +32,7 @@ async function generateProxyCollectionConfig(collectionId, env, target, part, tu
 			dns: buildProxyDNS(),
 			proxies: proxies,
 			'proxy-groups': buildProxyGroups(),
-			'rule-providers': buildRuleProviders('🚀 默认代理'),
+			'rule-providers': buildRuleProviders(),
 			rules: buildRules('🚀 默认代理')
 		};
 

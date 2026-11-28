@@ -97,7 +97,7 @@ function verifyToken(token, env) {
 		return true; // 未启用认证，直接通过
 	}
 
-	// 判断是否为本地开发环境 (wrangler dev)
+	// 判断是否为本地开发环境
 	const isDev = env.ENVIRONMENT === 'development' || !env.ACCESS_TOKEN;
 	const validToken = isDev ? env.ACCESS_TOKEN_DEV : env.ACCESS_TOKEN;
 
@@ -175,7 +175,7 @@ async function handleTokenVerification(request, env) {
 	try {
 		const { token } = await request.json();
 
-		// 判断是否为本地开发环境 (wrangler dev)
+		// 判断是否为本地开发环境
 		const isDev = env.ENVIRONMENT === 'development' || !env.ACCESS_TOKEN;
 		const validToken = isDev ? env.ACCESS_TOKEN_DEV : env.ACCESS_TOKEN;
 

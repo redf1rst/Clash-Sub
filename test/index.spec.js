@@ -1,14 +1,18 @@
-import { env, createExecutionContext, waitOnExecutionContext, SELF } from 'cloudflare:test';
-import { describe, it, expect } from 'vitest';
-import worker from '../src';
+import { describe, it, expect, beforeEach } from 'vitest';
+import appRouter from '../src/index.js';
+import { createTestEnv } from './helpers/node-test-env.js';
 
-describe('Clash订阅生成器 Worker', () => {
+let env;
+
+describe('Clash订阅生成器', () => {
+	beforeEach(() => {
+		env = createTestEnv();
+	});
+
 	describe('API Routes', () => {
 		it('GET /api/proxies returns empty array initially', async () => {
 			const request = new Request('http://example.com/api/proxies');
-			const ctx = createExecutionContext();
-			const response = await worker.fetch(request, env, ctx);
-			await waitOnExecutionContext(ctx);
+			const response = await appRouter.fetch(request, env);
 
 			expect(response.status).toBe(200);
 			expect(response.headers.get('Content-Type')).toBe('application/json');
@@ -18,9 +22,7 @@ describe('Clash订阅生成器 Worker', () => {
 
 		it('GET /api/submerge returns empty array initially', async () => {
 			const request = new Request('http://example.com/api/submerge');
-			const ctx = createExecutionContext();
-			const response = await worker.fetch(request, env, ctx);
-			await waitOnExecutionContext(ctx);
+			const response = await appRouter.fetch(request, env);
 
 			expect(response.status).toBe(200);
 			expect(response.headers.get('Content-Type')).toBe('application/json');
@@ -34,9 +36,7 @@ describe('Clash订阅生成器 Worker', () => {
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ action: 'invalid' })
 			});
-			const ctx = createExecutionContext();
-			const response = await worker.fetch(request, env, ctx);
-			await waitOnExecutionContext(ctx);
+			const response = await appRouter.fetch(request, env);
 
 			expect(response.status).toBe(400);
 		});
@@ -47,9 +47,7 @@ describe('Clash订阅生成器 Worker', () => {
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ action: 'invalid' })
 			});
-			const ctx = createExecutionContext();
-			const response = await worker.fetch(request, env, ctx);
-			await waitOnExecutionContext(ctx);
+			const response = await appRouter.fetch(request, env);
 
 			expect(response.status).toBe(400);
 		});
@@ -60,18 +58,14 @@ describe('Clash订阅生成器 Worker', () => {
 		// /clash/proxies/{collectionId} 与 /clash/submerge/{collectionId}
 		it('GET /clash/proxies (legacy global endpoint) returns 404', async () => {
 			const request = new Request('http://example.com/clash/proxies');
-			const ctx = createExecutionContext();
-			const response = await worker.fetch(request, env, ctx);
-			await waitOnExecutionContext(ctx);
+			const response = await appRouter.fetch(request, env);
 
 			expect(response.status).toBe(404);
 		});
 
 		it('GET /clash/submerge (legacy global endpoint) returns 404', async () => {
 			const request = new Request('http://example.com/clash/submerge');
-			const ctx = createExecutionContext();
-			const response = await worker.fetch(request, env, ctx);
-			await waitOnExecutionContext(ctx);
+			const response = await appRouter.fetch(request, env);
 
 			expect(response.status).toBe(404);
 		});
@@ -80,11 +74,9 @@ describe('Clash订阅生成器 Worker', () => {
 	describe('Static File Serving', () => {
 		it('GET / serves the static index page', async () => {
 			const request = new Request('http://example.com/');
-			const ctx = createExecutionContext();
-			const response = await worker.fetch(request, env, ctx);
-			await waitOnExecutionContext(ctx);
+			const response = await appRouter.fetch(request, env);
 
-			// 静态资源由 ASSETS binding 提供
+			// 静态资源由 ASSETS 提供
 			expect(response.status).toBe(200);
 		});
 	});
@@ -92,11 +84,9 @@ describe('Clash订阅生成器 Worker', () => {
 	describe('404 Handling', () => {
 		it('GET /nonexistent returns 404', async () => {
 			const request = new Request('http://example.com/nonexistent');
-			const ctx = createExecutionContext();
-			const response = await worker.fetch(request, env, ctx);
-			await waitOnExecutionContext(ctx);
+			const response = await appRouter.fetch(request, env);
 
-			// 不存在的路径交给 ASSETS, 响应体由平台决定, 只断言状态码
+			// 不存在的路径交给 ASSETS, 只断言状态码
 			expect(response.status).toBe(404);
 		});
 	});
@@ -272,13 +262,9 @@ describe('Clash订阅生成器 Worker', () => {
 
 	describe('Access Token Auth', () => {
 		// 这些用例临时打开令牌校验, 覆盖手机端"每次都要重新填令牌"的回归点
-		const authEnv = { ...env, ACCESS_TOKEN_ENABLED: 'true', ACCESS_TOKEN: 'my=secret;token' };
-
 		async function call(request) {
-			const ctx = createExecutionContext();
-			const response = await worker.fetch(request, authEnv, ctx);
-			await waitOnExecutionContext(ctx);
-			return response;
+			const authEnv = { ...env, ACCESS_TOKEN_ENABLED: 'true', ACCESS_TOKEN: 'my=secret;token' };
+			return appRouter.fetch(request, authEnv);
 		}
 
 		it('sets both cookies with SameSite=Lax (mobile in-app navigations must carry them)', async () => {

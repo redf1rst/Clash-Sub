@@ -9,8 +9,8 @@
 	<link rel="icon" type="image/png" href="https://github.com/redf1rst/clash-sub/blob/main/img/clash-sub.png?raw=true">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css" />
 	<script>
-		// 访问控制在 Worker 侧统一完成 (wrangler.toml: run_worker_first = true)。
-		// 页面能被送到浏览器, 就说明 Worker 认证已通过, 前端不再做二次 Cookie 判断:
+		// 访问控制在服务端路由入口统一完成（认证先于静态资源返回）。
+		// 页面能被送到浏览器, 就说明服务端认证已通过, 前端不再做二次 Cookie 判断:
 		// 之前基于 JS 可读 cookie (access_token_client) 的前端门禁在手机端会误判
 		// (iOS ITP 把脚本可写 Cookie 压到 7 天 / 微信等 WebView Cookie 罐不持久),
 		// 导致 HttpOnly 令牌仍在却仍被弹回 /auth。
@@ -23,7 +23,7 @@
 			}
 		})();
 
-		// 令牌失效时 (Worker 对 /api/* 返回 401) 统一回验证页, 避免每处 fetch 各写一套处理
+		// 令牌失效时 (服务端对 /api/* 返回 401) 统一回验证页, 避免每处 fetch 各写一套处理
 		(function () {
 			if (typeof window.fetch !== 'function') return;
 			var rawFetch = window.fetch.bind(window);
@@ -691,7 +691,7 @@
 				html += '</div>';
 				html += '<div class="item-actions">';
 				html += '<div class="item-actions-row-1">';
-				html += '<button class="btn clash-import" data-action="openImportMenu" data-kind="proxy" aria-haspopup="menu">导入订阅</button>';
+				html += '<button class="btn clash-import" data-action="openImportMenu" data-kind="proxy" aria-haspopup="menu">导入软件</button>';
 				html += '<button class="btn" data-action="copyCollectionLink">复制链接</button>';
 				html += '</div>';
 				html += '<div class="item-actions-row-2">';
@@ -804,7 +804,7 @@
 			activeImportMenu = null;
 		}
 
-		// 打开“导入订阅”客户端菜单
+		// 打开“导入软件”客户端菜单
 		function openImportMenu(collectionId, event, kind = 'proxy') {
 			const anchor = event?.currentTarget;
 			const collectionName = (kind === 'sub' ? subCollections : proxyCollections)
@@ -1533,7 +1533,7 @@
 				html += '</div>';
 				html += '<div class="item-actions">';
 				html += '<div class="item-actions-row-1">';
-				html += '<button class="btn clash-import" data-action="openImportMenu" data-kind="sub" aria-haspopup="menu">导入订阅</button>';
+				html += '<button class="btn clash-import" data-action="openImportMenu" data-kind="sub" aria-haspopup="menu">导入软件</button>';
 				html += '<button class="btn" data-action="copySubCollectionLink">复制链接</button>';
 				html += '<button class="btn" data-action="renameSubCollection">重命名</button>';
 				html += '</div>';

@@ -99,7 +99,7 @@ async function generateSubCollectionConfig(collectionId, env, target, part, tun,
 		}
 
 		// 规则集
-		config['rule-providers'] = buildRuleProviders('🚀 默认代理');
+		config['rule-providers'] = buildRuleProviders();
 
 		// submerge规则匹配
 		config.rules = buildRules('🚀 默认代理');

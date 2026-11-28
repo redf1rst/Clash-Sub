@@ -6,8 +6,8 @@
       "content-type": "text/yaml; charset=utf-8",
       "profile-update-interval": "12"
     },
-    "bytes": 17217,
-    "sha256": "4d83dfda19bfb4f21a35a6d94aec5937d6f1c828027e46bae37b0912e7aab0ce"
+    "bytes": 18356,
+    "sha256": "8db2c149698f0acfcb0ed90c05d5acd468cdce763fb3da0c14aa4f73fe863926"
   },
   "proxies/clash": {
     "status": 200,
@@ -16,8 +16,8 @@
       "content-type": "text/yaml; charset=utf-8",
       "profile-update-interval": "12"
     },
-    "bytes": 17217,
-    "sha256": "4d83dfda19bfb4f21a35a6d94aec5937d6f1c828027e46bae37b0912e7aab0ce"
+    "bytes": 18356,
+    "sha256": "8db2c149698f0acfcb0ed90c05d5acd468cdce763fb3da0c14aa4f73fe863926"
   },
   "proxies/stash": {
     "status": 200,
@@ -28,8 +28,8 @@
       "profile-update-interval": "12",
       "x-clashsub-target": "stash"
     },
-    "bytes": 14555,
-    "sha256": "427a4062a8114cd8884cd43230352f895475d210cf830ec8d8fd24b8dc68a24d"
+    "bytes": 15598,
+    "sha256": "5e253547a258527fce0236aa73f38001c4cc6042a6f514c109c376410ad349ce"
   },
   "proxies/shadowrocket": {
     "status": 200,
@@ -40,8 +40,8 @@
       "profile-update-interval": "12",
       "x-clashsub-target": "shadowrocket"
     },
-    "bytes": 14555,
-    "sha256": "427a4062a8114cd8884cd43230352f895475d210cf830ec8d8fd24b8dc68a24d"
+    "bytes": 15598,
+    "sha256": "5e253547a258527fce0236aa73f38001c4cc6042a6f514c109c376410ad349ce"
   },
   "proxies/singbox": {
     "status": 200,
@@ -53,8 +53,8 @@
       "x-clashsub-skipped": "0",
       "x-clashsub-target": "singbox"
     },
-    "bytes": 15580,
-    "sha256": "475740aa1df8c9ae99bcd228ff01ee4d1f1ec681325127f5e45038521ed975fd"
+    "bytes": 17261,
+    "sha256": "4238497c1701884580ba5c713115341f96b36760a227357b8eabe8d78d627b17"
   },
   "proxies/singbox-tun": {
     "status": 200,
@@ -66,8 +66,8 @@
       "x-clashsub-skipped": "0",
       "x-clashsub-target": "singbox"
     },
-    "bytes": 15806,
-    "sha256": "1d5025592a60275514b28fd765ed3e5309d2ce5825c52e486e90e9d04683280a"
+    "bytes": 17487,
+    "sha256": "871c728fe2b01f86b2e62cd764672b8055aaa450140b9067590dd2f92d639b63"
   },
   "proxies/singbox-minimal": {
     "status": 200,
@@ -105,8 +105,8 @@
       "x-clashsub-skipped": "0",
       "x-clashsub-target": "qx"
     },
-    "bytes": 3342,
-    "sha256": "bb6ce100e39c125ec34bfef3fb271b8814aa852bbd53d10e5683e7cbcd9982b4"
+    "bytes": 3975,
+    "sha256": "6168a6ef1e30839baff4c11ff07f572fe573b1a9a1b6a56f53e99b7f438b47ef"
   },
   "proxies/qx-alias-default-part": {
     "status": 200,
@@ -128,8 +128,8 @@
       "content-type": "text/yaml; charset=utf-8",
       "profile-update-interval": "12"
     },
-    "bytes": 17217,
-    "sha256": "4d83dfda19bfb4f21a35a6d94aec5937d6f1c828027e46bae37b0912e7aab0ce"
+    "bytes": 18356,
+    "sha256": "8db2c149698f0acfcb0ed90c05d5acd468cdce763fb3da0c14aa4f73fe863926"
   },
   "submerge/default": {
     "status": 200,
@@ -143,8 +143,8 @@
       "x-clashsub-source-failed": "0",
       "x-clashsub-source-refreshed": "2"
     },
-    "bytes": 17226,
-    "sha256": "ba92a0cbd0c5a251fc7cf71800d06391acca08711c9cfbffaeeff64cced6bc20"
+    "bytes": 18365,
+    "sha256": "90fc6aa50792ea12584aa3166279b9fa20d25d667559ee7bc01ca07f81a05977"
   },
   "submerge/clash": {
     "status": 200,
@@ -158,8 +158,8 @@
       "x-clashsub-source-failed": "0",
       "x-clashsub-source-refreshed": "2"
     },
-    "bytes": 17226,
-    "sha256": "ba92a0cbd0c5a251fc7cf71800d06391acca08711c9cfbffaeeff64cced6bc20"
+    "bytes": 18365,
+    "sha256": "90fc6aa50792ea12584aa3166279b9fa20d25d667559ee7bc01ca07f81a05977"
   },
   "submerge/stash": {
     "status": 200,
@@ -175,8 +175,8 @@
       "x-clashsub-source-refreshed": "2",
       "x-clashsub-target": "stash"
     },
-    "bytes": 14570,
-    "sha256": "387d7dcef24051b3d96974185dce2ac056b0cb3e4ea8e4277db3f23e69682e56"
+    "bytes": 15613,
+    "sha256": "587d2df01857b4a0c33c8dd6b34afc0909be318c63e83213cf37be0e427ca5c2"
   },
   "submerge/shadowrocket": {
     "status": 200,
@@ -192,8 +192,8 @@
       "x-clashsub-source-refreshed": "2",
       "x-clashsub-target": "shadowrocket"
     },
-    "bytes": 14570,
-    "sha256": "387d7dcef24051b3d96974185dce2ac056b0cb3e4ea8e4277db3f23e69682e56"
+    "bytes": 15613,
+    "sha256": "587d2df01857b4a0c33c8dd6b34afc0909be318c63e83213cf37be0e427ca5c2"
   },
   "submerge/singbox": {
     "status": 200,
@@ -210,8 +210,8 @@
       "x-clashsub-source-refreshed": "2",
       "x-clashsub-target": "singbox"
     },
-    "bytes": 14934,
-    "sha256": "1df7b5198637856777f130cfe0ab4372baeb91e5e879228f6439661619571bf2"
+    "bytes": 16615,
+    "sha256": "ac0c499f01bfb0a7d615e78ac95eb2e6af13ce80198116559403339b8727d8b7"
   },
   "submerge/singbox-tun": {
     "status": 200,
@@ -228,8 +228,8 @@
       "x-clashsub-source-refreshed": "2",
       "x-clashsub-target": "singbox"
     },
-    "bytes": 15160,
-    "sha256": "80fc6fb905b7befb1c311531ce4af3e2adb8c18151559842499770816e3748a4"
+    "bytes": 16841,
+    "sha256": "efbc303deba624d69a03f9f7c054afcc826b2244d0c40ccfe5ec1198b2e2f005"
   },
   "submerge/singbox-minimal": {
     "status": 200,
@@ -282,8 +282,8 @@
       "x-clashsub-source-refreshed": "2",
       "x-clashsub-target": "qx"
     },
-    "bytes": 3333,
-    "sha256": "8edc17016310558c64f4a6fedd895a730ac0f13e71e464fa410a769ee5e072f3"
+    "bytes": 3966,
+    "sha256": "e3006fdbe78092da7844c32e1e82dd60db2eef9621e76cc02ba9491cd1df73cb"
   },
   "submerge/qx-alias-default-part": {
     "status": 200,
@@ -315,8 +315,8 @@
       "x-clashsub-source-failed": "0",
       "x-clashsub-source-refreshed": "2"
     },
-    "bytes": 17226,
-    "sha256": "ba92a0cbd0c5a251fc7cf71800d06391acca08711c9cfbffaeeff64cced6bc20"
+    "bytes": 18365,
+    "sha256": "90fc6aa50792ea12584aa3166279b9fa20d25d667559ee7bc01ca07f81a05977"
   },
   "submerge/no-prefix/default": {
     "status": 200,
@@ -330,8 +330,8 @@
       "x-clashsub-source-failed": "0",
       "x-clashsub-source-refreshed": "2"
     },
-    "bytes": 17193,
-    "sha256": "65b966aae1fb1244d3a4a11b5cd6be7d208f1cb36f2f49e1827879983d067970"
+    "bytes": 18332,
+    "sha256": "301ed4a0110866228de9e1d38e6aef13b1906dcf2763412b21eae110786fe723"
   },
   "submerge/no-prefix/clash": {
     "status": 200,
@@ -345,8 +345,8 @@
       "x-clashsub-source-failed": "0",
       "x-clashsub-source-refreshed": "2"
     },
-    "bytes": 17193,
-    "sha256": "65b966aae1fb1244d3a4a11b5cd6be7d208f1cb36f2f49e1827879983d067970"
+    "bytes": 18332,
+    "sha256": "301ed4a0110866228de9e1d38e6aef13b1906dcf2763412b21eae110786fe723"
   },
   "submerge/no-prefix/stash": {
     "status": 200,
@@ -362,8 +362,8 @@
       "x-clashsub-source-refreshed": "2",
       "x-clashsub-target": "stash"
     },
-    "bytes": 14529,
-    "sha256": "e7802bcce7821d9a538e041bfeb984d45beacfdc3486ff70be67578bdd3b654a"
+    "bytes": 15572,
+    "sha256": "f6273f56df9c21cb3e75612a29577cddc722c9b6d427b2739fa0180d1c47399f"
   },
   "submerge/no-prefix/shadowrocket": {
     "status": 200,
@@ -379,8 +379,8 @@
       "x-clashsub-source-refreshed": "2",
       "x-clashsub-target": "shadowrocket"
     },
-    "bytes": 14529,
-    "sha256": "e7802bcce7821d9a538e041bfeb984d45beacfdc3486ff70be67578bdd3b654a"
+    "bytes": 15572,
+    "sha256": "f6273f56df9c21cb3e75612a29577cddc722c9b6d427b2739fa0180d1c47399f"
   },
   "submerge/no-prefix/singbox": {
     "status": 200,
@@ -397,8 +397,8 @@
       "x-clashsub-source-refreshed": "2",
       "x-clashsub-target": "singbox"
     },
-    "bytes": 14301,
-    "sha256": "0fbf773170bd6fa583299cc55171b90c7dc52945d7b7fbbd794d50a0aa2568a4"
+    "bytes": 15982,
+    "sha256": "7f494991c6bf6094fb1ccfe942e84a15217ddbd272b1879355be8c0d3849b0ad"
   },
   "submerge/no-prefix/singbox-tun": {
     "status": 200,
@@ -415,8 +415,8 @@
       "x-clashsub-source-refreshed": "2",
       "x-clashsub-target": "singbox"
     },
-    "bytes": 14527,
-    "sha256": "7f3d6d651c3ff85eaa15c26c5a4c98a11540b13b8f024157d269e298c5e89024"
+    "bytes": 16208,
+    "sha256": "c2f2b4e74b5b90c106fc58998e286766d064dc16d87a3291825b0d8380f9ff10"
   },
   "submerge/no-prefix/singbox-minimal": {
     "status": 200,
@@ -466,8 +466,8 @@
       "x-clashsub-source-failed": "0",
       "x-clashsub-source-refreshed": "2"
     },
-    "bytes": 17226,
-    "sha256": "ba92a0cbd0c5a251fc7cf71800d06391acca08711c9cfbffaeeff64cced6bc20"
+    "bytes": 18365,
+    "sha256": "90fc6aa50792ea12584aa3166279b9fa20d25d667559ee7bc01ca07f81a05977"
   },
   "submerge/cache/fallback": {
     "status": 200,
@@ -481,8 +481,8 @@
       "x-clashsub-source-failed": "0",
       "x-clashsub-source-refreshed": "0"
     },
-    "bytes": 17226,
-    "sha256": "ba92a0cbd0c5a251fc7cf71800d06391acca08711c9cfbffaeeff64cced6bc20"
+    "bytes": 18365,
+    "sha256": "90fc6aa50792ea12584aa3166279b9fa20d25d667559ee7bc01ca07f81a05977"
   },
   "submerge/cache/uncached-failure": {
     "status": 502,

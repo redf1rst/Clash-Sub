@@ -1,19 +1,21 @@
 {
 	"name": "clash-sub",
-	"version": "3.6.0",
+	"version": "3.7.1",
 	"private": true,
+	"type": "module",
 	"scripts": {
-		"deploy": "wrangler deploy",
-		"dev": "wrangler dev",
-		"start": "wrangler dev",
-		"test": "vitest"
+		"dev": "node --watch server/index.js",
+		"start": "node server/index.js",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:docker": "node --test test/docker-server.node.test.js",
+		"test:all": "vitest run && node --test test/docker-server.node.test.js"
 	},
 	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "^0.8.19",
-		"vitest": "~3.2.0",
-		"wrangler": "^4.163.0"
+		"vitest": "~3.2.0"
 	},
 	"dependencies": {
+		"pg": "^8.23.1",
 		"yaml": "^2.9.1"
 	}
 }

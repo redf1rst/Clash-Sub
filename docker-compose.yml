@@ -1,0 +1,35 @@
+services:
+  clash-sub:
+    image: redfirst/clash-sub:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clash-sub
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8787}:8787"
+    environment:
+      PORT: "8787"
+      HOST: "0.0.0.0"
+      DATA_DIR: "/data"
+      DATABASE_URL: "${DATABASE_URL:-}"
+      DATABASE_SSL: "${DATABASE_SSL:-}"
+      DATABASE_CA_CERT: "${DATABASE_CA_CERT:-}"
+      DATABASE_CA_CERT_PATH: "${DATABASE_CA_CERT_PATH:-}"
+      PG_POOL_MAX: "${PG_POOL_MAX:-5}"
+      TRUST_PROXY: "${TRUST_PROXY:-true}"
+      ACCESS_TOKEN_ENABLED: "${ACCESS_TOKEN_ENABLED:-true}"
+      ACCESS_TOKEN: "${ACCESS_TOKEN:-}"
+      ACCESS_TOKEN_DEV: "${ACCESS_TOKEN_DEV:-}"
+      ENVIRONMENT: "${ENVIRONMENT:-production}"
+    volumes:
+      - clash-sub-data:/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8787/healthz').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+volumes:
+  clash-sub-data:

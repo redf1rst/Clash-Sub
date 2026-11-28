@@ -47,7 +47,7 @@ export function expectAuthorizedRules(expect, config, defaultProxy) {
   expect(config.rules.some(rule => rule.startsWith('IP-CIDR6,::/0,'))).toBe(false);
   // This configuration update replaces the old rule lists with the supplied YAML.
   // Private CIDRs now come from private_ip; cn_ip remains a resolving fallback.
-  expect(config.rules).toHaveLength(32);
+  expect(config.rules).toHaveLength(40);
   expect(config.rules.slice(0, 2)).toEqual(['RULE-SET,private_domain,DIRECT', 'RULE-SET,private_ip,DIRECT,no-resolve']);
   const firstResolvingIp = config.rules.indexOf('RULE-SET,cn_ip,DIRECT');
   expect(firstResolvingIp).toBe(config.rules.length - 2);
@@ -56,7 +56,13 @@ export function expectAuthorizedRules(expect, config, defaultProxy) {
     expect(index).toBeGreaterThanOrEqual(0);
     expect(index).toBeLessThan(firstResolvingIp);
   }
-  expect(config.rules).toContain('IP-CIDR,17.0.0.0/8,苹果服务,no-resolve');
+  for (const domain of ['github.com', 'githubusercontent.com', 'githubassets.com', 'githubapp.com', 'github.dev', 'github.io', 'github.blog', 'githubstatus.com']) {
+     const rule = `DOMAIN-SUFFIX,${domain},${defaultProxy}`;
+     const index = config.rules.indexOf(rule);
+     expect(index).toBeGreaterThanOrEqual(0);
+     expect(index).toBeLessThan(firstResolvingIp);
+   }
+   expect(config.rules).toContain('IP-CIDR,17.0.0.0/8,苹果服务,no-resolve');
   expect(config.rules).toContain('RULE-SET,advertising_ads,REJECT');
   for (const [provider, policy] of [['ai', 'AI服务'], ['netflix_domain', 'Netflix'], ['tiktok_domain', 'TikTok'], ['spotify_domain', 'Spotify'], ['paypal_domain', 'PayPal']]) {
     expect(config.rules).toContain(`RULE-SET,${provider},${policy}`);

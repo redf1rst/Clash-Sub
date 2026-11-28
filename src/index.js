@@ -1,4 +1,4 @@
-// Cloudflare Worker entry: routing only. Business logic lives in focused modules.
+// Application router entry: routing, authentication order, and static asset fallback.
 import { handleProxiesAPI } from './api/proxies.js';
 import { handleProxyCollectionsAPI } from './api/proxy-collections.js';
 import { handleSubCollectionsAPI } from './api/subscription-collections.js';

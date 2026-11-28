@@ -1,7 +1,10 @@
-import { describe, expect, it, beforeEach } from 'vitest';
-import { env, fetchMock } from 'cloudflare:test';
+import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import { parse as parseYaml } from 'yaml';
-import worker from '../src/index.js';
+import appRouter from '../src/index.js';
+import { createFetchMock, createTestEnv } from './helpers/node-test-env.js';
+
+const fetchMock = createFetchMock();
+let env;
 
 const collectionId = 'sub_inspect';
 const feedUrl = 'https://feed-inspect.example/sub';
@@ -21,12 +24,13 @@ const feed = `proxies:
 `;
 
 async function getConfig(query) {
-	const response = await worker.fetch(new Request(`https://clashsub.example/clash/submerge/${collectionId}?${query}`), env, {});
+	const response = await appRouter.fetch(new Request(`https://clashsub.example/clash/submerge/${collectionId}?${query}`), env, {});
 	return { response, body: await response.text() };
 }
 
 describe('client format shape', () => {
 	beforeEach(async () => {
+		env = createTestEnv();
 		fetchMock.activate();
 		fetchMock.disableNetConnect();
 		await env.CLASH_KV.put('sub_collections', JSON.stringify([{
@@ -37,6 +41,10 @@ describe('client format shape', () => {
 			enablePrefix: true
 		}]));
 		fetchMock.get('https://feed-inspect.example').intercept({ path: '/sub' }).reply(200, feed).persist();
+	});
+
+	afterEach(() => {
+		fetchMock.deactivate();
 	});
 
 	it('produces a Stash config whose dns values match Stash types', async () => {

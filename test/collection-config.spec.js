@@ -1,8 +1,11 @@
-import { describe, expect, it, beforeEach } from 'vitest';
-import { env, fetchMock } from 'cloudflare:test';
+import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import { parse as parseYaml } from 'yaml';
-import worker from '../src/index.js';
+import appRouter from '../src/index.js';
 import { expectAuthorizedRules } from './fixtures/authorized-config.js';
+import { createFetchMock, createTestEnv } from './helpers/node-test-env.js';
+
+const fetchMock = createFetchMock();
+let env;
 
 let collectionId = 'sub_fixture_0';
 let feedUrl = 'https://feed-0.example/subscription';
@@ -20,17 +23,22 @@ const feeds = [
 ];
 
 async function getConfig() {
-	return worker.fetch(new Request(`https://clashsub.example/clash/submerge/${collectionId}`), env, {});
+	return appRouter.fetch(new Request(`https://clashsub.example/clash/submerge/${collectionId}`), env, {});
 }
 
 describe('flattened subscription collection config', () => {
 	beforeEach(async () => {
+		env = createTestEnv();
 		fixtureNumber++;
 		collectionId = `sub_fixture_${fixtureNumber}`;
 		feedUrl = `https://feed-${fixtureNumber}.example/subscription`;
 		fetchMock.activate();
 		fetchMock.disableNetConnect();
 		await env.CLASH_KV.put('sub_collections', JSON.stringify([makeCollection()]));
+	});
+
+	afterEach(() => {
+		fetchMock.deactivate();
 	});
 
 	it('inlines parsed proxies while preserving profile rules, DNS and compatible headers', async () => {
@@ -77,7 +85,7 @@ describe('flattened subscription collection config', () => {
 	it('accepts a raw URI subscription at the existing collection API', async () => {
 		await env.CLASH_KV.put('sub_collections', JSON.stringify([makeCollection([], [])]));
 		fetchMock.get(new URL(feedUrl).origin).intercept({ path: '/subscription' }).reply(200, 'vless://x@node.example:443?encryption=none#Direct-01');
-		const response = await worker.fetch(new Request('https://clashsub.example/api/sub-collections', {
+		const response = await appRouter.fetch(new Request('https://clashsub.example/api/sub-collections', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ action: 'addSubscription', data: { collectionId, subscriptionUrls: feedUrl } })
@@ -90,7 +98,7 @@ describe('flattened subscription collection config', () => {
 
 	it('rejects private network subscription targets before outbound fetch', async () => {
 		await env.CLASH_KV.put('sub_collections', JSON.stringify([makeCollection([], [])]));
-		const response = await worker.fetch(new Request('https://clashsub.example/api/sub-collections', {
+		const response = await appRouter.fetch(new Request('https://clashsub.example/api/sub-collections', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ action: 'addSubscription', data: { collectionId, subscriptionUrls: 'http://127.0.0.1:8787/sub' } })
@@ -105,18 +113,18 @@ describe('flattened subscription collection config', () => {
 		await env.CLASH_KV.put('sub_collections', JSON.stringify([makeCollection()]));
 		fetchMock.get(new URL(feedUrl).origin).intercept({ path: '/subscription' }).reply(200, feeds[0]).persist();
 
-		const stashResponse = await worker.fetch(new Request(`https://clashsub.example/clash/submerge/${collectionId}?target=stash`), env, {});
+		const stashResponse = await appRouter.fetch(new Request(`https://clashsub.example/clash/submerge/${collectionId}?target=stash`), env, {});
 		expect(stashResponse.headers.get('X-ClashSub-Target')).toBe('stash');
 		const stash = parseYaml(await stashResponse.text());
 		expect(stash['proxy-groups'].every(group => group['include-all-proxies'] === undefined)).toBe(true);
 
-		const singboxResponse = await worker.fetch(new Request(`https://clashsub.example/clash/submerge/${collectionId}?target=singbox`), env, {});
+		const singboxResponse = await appRouter.fetch(new Request(`https://clashsub.example/clash/submerge/${collectionId}?target=singbox`), env, {});
 		expect(singboxResponse.headers.get('content-type')).toContain('application/json');
 		const singbox = await singboxResponse.json();
 		expect(singbox.outbounds.some(outbound => outbound.tag === '[Japan]JP-01')).toBe(true);
 		expect(singbox.route.final).toBe('🚀 默认代理');
 
-		const qxResponse = await worker.fetch(new Request(`https://clashsub.example/clash/submerge/${collectionId}?target=qx`), env, {});
+		const qxResponse = await appRouter.fetch(new Request(`https://clashsub.example/clash/submerge/${collectionId}?target=qx`), env, {});
 		expect(qxResponse.headers.get('content-type')).toContain('text/plain');
 		expect(await qxResponse.text()).toContain('vless=');
 	});

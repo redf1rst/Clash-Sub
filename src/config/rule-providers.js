@@ -1,12 +1,12 @@
 // Return fresh providers while preserving source order and daily refreshes.
-export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
+export function buildRuleProviders() {
 	return {
 		"private_domain": {
 			"type": "http",
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs",
 			"path": "./ruleset/private_domain.mrs"
 		},
@@ -15,7 +15,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "ipcidr",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs",
 			"path": "./ruleset/private_ip.mrs"
 		},
@@ -24,7 +24,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/mihomo-ruleset/fakeip-filter.mrs",
 			"path": "./ruleset/fakeip_filter.mrs"
 		},
@@ -33,7 +33,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/Kwisma/rules/main/rules/mihomo/STUN/STUN_Domain.mrs",
 			"path": "./ruleset/stun_domain.mrs"
 		},
@@ -42,7 +42,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.mrs",
 			"path": "./ruleset/advertising_ads.mrs"
 		},
@@ -51,7 +51,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-!cn.mrs",
 			"path": "./ruleset/ai.mrs"
 		},
@@ -60,7 +60,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs",
 			"path": "./ruleset/netflix_domain.mrs"
 		},
@@ -69,7 +69,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "ipcidr",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs",
 			"path": "./ruleset/netflix_ip.mrs"
 		},
@@ -78,7 +78,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs",
 			"path": "./ruleset/tiktok_domain.mrs"
 		},
@@ -87,7 +87,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.mrs",
 			"path": "./ruleset/spotify_domain.mrs"
 		},
@@ -96,7 +96,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/paypal.mrs",
 			"path": "./ruleset/paypal_domain.mrs"
 		},
@@ -105,7 +105,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.mrs",
 			"path": "./ruleset/microsoft_domain.mrs"
 		},
@@ -114,7 +114,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple-cn.mrs",
 			"path": "./ruleset/apple_cn_domain.mrs"
 		},
@@ -123,7 +123,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/gfw.mrs",
 			"path": "./ruleset/gfw_domain.mrs"
 		},
@@ -132,7 +132,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs",
 			"path": "./ruleset/geolocation-!cn.mrs"
 		},
@@ -141,7 +141,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "domain",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs",
 			"path": "./ruleset/cn_domain.mrs"
 		},
@@ -150,7 +150,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "ipcidr",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs",
 			"path": "./ruleset/cn_ip.mrs"
 		},
@@ -159,7 +159,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "ipcidr",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs",
 			"path": "./ruleset/google_ip.mrs"
 		},
@@ -168,7 +168,7 @@ export function buildRuleProviders(defaultProxy = '🚀 默认代理') {
 			"interval": 86400,
 			"behavior": "ipcidr",
 			"format": "mrs",
-			"proxy": defaultProxy,
+			"proxy": "♻️ 自动选择",
 			"url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs",
 			"path": "./ruleset/telegram_ip.mrs"
 		}

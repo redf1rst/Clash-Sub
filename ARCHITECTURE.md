@@ -1,16 +1,17 @@
 # Clash Sub 架构与维护边界
 
-## 重构范围
+## 运行时与架构概述
 
-项目运行于 Cloudflare Workers，使用 JavaScript ES Modules、KV、静态资源、YAML 和 Vitest。此次先修正两类集合授权范围内的 DNS 相关规则，删除 `IP-CIDR6,::/0,DIRECT,no-resolve`，再模块化。顶层 IPv6 仍开启；不引入新功能、存储迁移或部署。
+项目已全面迁移至 **Node.js + Docker** 运行时（Cloudflare Workers 与 Wrangler 已废弃并清理），使用 JavaScript ES Modules、KV 持久层（PostgreSQL / 本地 SQLite）、静态资源服务、YAML 和纯 Node Vitest。
 
-唯一 [Worker 入口](<src/index.js>) 由 [Wrangler 配置](<wrangler.toml>) 的 `main` 指向，入口缩减为 73 行。初次模块化形成 44 个源码模块：41 个承担原入口声明及配置工厂，另有 3 个既存外围模块。107 个原顶层声明各有唯一归属，105 个原样移动，仅两类配置生成函数改为组合工厂。后续按用户最新 YAML 同步非节点策略，新增共享 [全局选项工厂](<src/config/global-options.js>)；当前为 45 个源码模块。
+[HTTP 服务入口](<server/index.js>) 负责端口监听、健康检查（`/healthz`）、静态资源与 KV 初始化，并将 Web `Request` 分发给核心 [路由入口](<src/index.js>)（73 行）。核心源码保持 45 个职责清晰的模块，保留所有集合管理、协议解析、订阅缓存与多客户端转换逻辑。
 
 ## 模块地图
 
 | 边界 | 文件与职责 |
 | --- | --- |
-| 入口 | [index.js](<src/index.js>)：认证接口、认证检查、路由、集合查询参数、ASSETS 回退 |
+| 服务与存储 | [server/index.js](<server/index.js>)、[server/kv-postgres.js](<server/kv-postgres.js>)、[server/kv.js](<server/kv.js>)、[server/assets.js](<server/assets.js>)：Node HTTP 服务、PostgreSQL/SQLite KV 与静态资源 |
+| 路由入口 | [index.js](<src/index.js>)：认证接口、认证检查、路由、集合查询参数、ASSETS 回退 |
 | 旧 API | [proxies.js](<src/api/proxies.js>)、[subscriptions.js](<src/api/subscriptions.js>)：HTTP 方法与 action 分发 |
 | 集合 API | [proxy-collections.js](<src/api/proxy-collections.js>)、[subscription-collections.js](<src/api/subscription-collections.js>)：集合 HTTP 契约 |
 | 节点集合 | [proxies.js](<src/collections/proxies.js>)：CRUD；[proxy-import.js](<src/collections/proxy-import.js>)：URI/JSON/混合导入、去重、地区命名 |
@@ -35,8 +36,8 @@
 ## 依赖方向
 
 ```text
-Worker → API → 集合/旧版业务 → 订阅服务、解析、工具
-Worker → 配置编排 → 集合读取、来源缓存、工厂、客户端格式、YAML
+Server → 路由入口 → API → 集合/旧版业务 → 订阅服务、解析、工具
+Server → 路由入口 → 配置编排 → 集合读取、来源缓存、工厂、客户端格式、YAML
 来源信息/缓存 → 来源解码（注入 options.parseProxyUrl）
 URI 分派 → 协议解析器 → 地址工具/解析 helpers
 ```
@@ -117,9 +118,8 @@ URL/名称按索引对齐；`enablePrefix !== false` 默认开启。集合 ID、
 2026-11-27 最新配置同步补充了 [源策略与转换回归](<test/latest-config.spec.js>)。源配置与工厂逐字段深等，37 组响应独立推导后与实现逐字节核验：24 组正文变化、13 组不变，全部状态码与响应头不变。完整 Workers 测试及 Wrangler dry-run 均退出码 0；没有部署、操作生产 KV 或请求真实订阅。旧基线在本次修改前已有的两条域名规则差异及更新过程，详见 [测试说明](<test/fixtures/BASELINE.md>)、[响应基线](<test/fixtures/authorized-config-baseline.json>)、[回归测试](<test/config-baseline.spec.js>)。不要自动更新基线以使测试通过。
 
 ```bash
-npm test -- --run
-# 仅打包检查，不发布
-npx wrangler deploy --dry-run
+# 运行全部回归测试（Vitest + Docker 运行时集成测试）
+npm run test:all
 ```
 
 真实远端资源、客户端运行和生产 KV 未验证，离线结果不能宣称覆盖这些环境。日常修改检查模块归属/显式依赖、前端实参/响应/KV 顺序、自由引用/循环/协议边缘参数，两类逐 target 的顺序/序列化/headers、TUN/minimal、前缀关闭、快照失败回退和空缺集合。真实来源诊断、生产操作及部署单独授权。

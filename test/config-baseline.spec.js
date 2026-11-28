@@ -1,11 +1,13 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { fetchMock } from 'cloudflare:test';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { parse as parseYaml } from 'yaml';
-import worker from '../src/index.js';
-import baseline from './fixtures/authorized-config-baseline.json';
+import appRouter from '../src/index.js';
+import baseline from './fixtures/authorized-config-baseline.json' with { type: 'json' };
 import { collectionId, configUrl, expectAuthorizedRules, makeEnv, mockFeeds, variants } from './fixtures/authorized-config.js';
+import { createFetchMock } from './helpers/node-test-env.js';
 
-// Fixed bodies derive from the sanitized source YAML and pre-update synthetic nodes.
+const fetchMock = createFetchMock();
+
+// Fixed bodies derive independently from the sanitized source YAML and fixed synthetic nodes/subscriptions.
 // Status/headers and errors retain the prior baseline; see fixtures/BASELINE.md.
 // Never regenerate this fixture from current output to hide a regression.
 async function responseFingerprint(response) {
@@ -19,7 +21,7 @@ async function responseFingerprint(response) {
   };
 }
 async function assertBaseline(label, url, env) {
-  const response = await worker.fetch(new Request(url), env, {});
+  const response = await appRouter.fetch(new Request(url), env, {});
   expect(await responseFingerprint(response), label).toEqual(baseline[label]);
 }
 
@@ -30,6 +32,10 @@ describe('authorized source configuration response baselines', () => {
   beforeEach(() => {
     fetchMock.activate();
     fetchMock.disableNetConnect();
+  });
+
+  afterEach(() => {
+    fetchMock.deactivate();
   });
 
   it('keeps the fixed baseline matrix complete', () => {
@@ -65,7 +71,7 @@ describe('authorized source configuration response baselines', () => {
 
   it.each(['proxies', 'submerge'])('%s explicitly preserves the authorized rule changes', async kind => {
     if (kind === 'submerge') mockFeeds(fetchMock);
-    const response = await worker.fetch(new Request(configUrl(kind)), makeEnv(), {});
+    const response = await appRouter.fetch(new Request(configUrl(kind)), makeEnv(), {});
     expectAuthorizedRules(expect, parseYaml(await response.text()), '🚀 默认代理');
     fetchMock.assertNoPendingInterceptors();
   });
